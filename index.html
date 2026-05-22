@@ -35,6 +35,7 @@
       <nav class="tool-tabs" aria-label="工具导航">
         <a class="tool-tab" href="#home" data-view-link="home">工具首页</a>
         <a class="tool-tab" href="#speed-test" data-view-link="speed-test">大模型测速</a>
+        <a class="tool-tab" href="#color-palette" data-view-link="color-palette">AI 配色推荐</a>
       </nav>
 
       <main id="homeView" class="layout tool-view">
@@ -52,11 +53,147 @@
               <strong>大模型速度测试台</strong>
               <p>对比 OpenAI 兼容接口和 Anthropic 接口的 TTFT、总耗时、tokens/s。</p>
             </a>
+            <a class="tool-card" href="#color-palette" data-view-link="color-palette">
+              <span class="tool-card-kicker">Palette Generator</span>
+              <strong>AI 配色推荐</strong>
+              <p>根据场景、风格和主色生成网页可用色板、CSS 变量和界面预览。</p>
+            </a>
             <article class="tool-card tool-card-disabled">
               <span class="tool-card-kicker">Coming Soon</span>
               <strong>更多工具</strong>
               <p>后续可以继续添加 Prompt 工具、Token 估算、配置生成等静态子工具。</p>
             </article>
+          </div>
+        </section>
+      </main>
+
+      <main id="colorPaletteView" class="layout tool-view hidden">
+        <section class="panel tool-title-panel">
+          <div class="section-head compact">
+            <div>
+              <p class="section-tag">Palette Generator</p>
+              <h2>AI 配色推荐</h2>
+            </div>
+            <a class="ghost-link" href="#home" data-view-link="home">返回工具首页</a>
+          </div>
+          <p class="tip">输入产品场景和风格，生成可用于网页设计的色板、CSS 变量和 UI 预览。</p>
+        </section>
+
+        <section class="panel palette-panel">
+          <div class="palette-layout">
+            <div class="palette-controls">
+              <div class="section-head compact">
+                <div>
+                  <p class="section-tag">Input</p>
+                  <h2>配色需求</h2>
+                </div>
+              </div>
+              <div class="palette-mode-tabs" role="tablist" aria-label="配色模式">
+                <button id="paletteAutoModeBtn" class="palette-mode-tab active" type="button" data-palette-mode="auto">自动生成</button>
+                <button id="palettePresetModeBtn" class="palette-mode-tab" type="button" data-palette-mode="preset">精选预设</button>
+              </div>
+              <div class="form-grid palette-form">
+                <label class="field palette-auto-field">
+                  <span>风格</span>
+                  <select id="paletteStyleInput">
+                    <option value="tech">科技冷静</option>
+                    <option value="warm">温暖友好</option>
+                    <option value="fresh">清爽自然</option>
+                    <option value="luxury">高级克制</option>
+                    <option value="cyber">赛博活力</option>
+                  </select>
+                </label>
+                <label class="field palette-auto-field">
+                  <span>主色</span>
+                  <div class="color-picker-field">
+                    <input id="paletteBaseColorInput" class="color-picker-native" type="color" value="#2563eb" aria-label="选择主色" />
+                    <span id="paletteBaseColorPreview" class="color-picker-preview" style="--selected-color:#2563eb"></span>
+                    <input id="paletteBaseColorTextInput" class="color-picker-text" type="text" value="#2563eb" maxlength="7" aria-label="主色 HEX" />
+                  </div>
+                </label>
+                <label class="field hidden">
+                  <span>精选预设</span>
+                  <select id="palettePresetInput">
+                    <option value="">不使用预设</option>
+                    <option value="sakura">雾白深蓝</option>
+                    <option value="bamboo">鼠尾草奶油</option>
+                    <option value="porcelain">冷雾青瓷</option>
+                    <option value="sunset">杏仁暖阳</option>
+                    <option value="ink">炭黑云灰</option>
+                    <option value="cream">奶油玫瑰</option>
+                    <option value="softNeutral">现代办公</option>
+                    <option value="warmReading">暖纸阅读</option>
+                    <option value="pastelFocus">薰衣草雾</option>
+                    <option value="solarizedLight">海盐薄荷</option>
+                    <option value="nordCalm">北境冰蓝</option>
+                    <option value="softIvory">月光石灰</option>
+                    <option value="sageStone">森林雾绿</option>
+                    <option value="mistBlue">深海浅蓝</option>
+                    <option value="oatCoffee">可可燕麦</option>
+                    <option value="creamApricot">蜜桃奶油</option>
+                    <option value="pearlMist">珍珠紫灰</option>
+                  </select>
+                </label>
+              </div>
+              <div id="palettePresetTabs" class="palette-preset-tabs hidden" aria-label="精选配色方案"></div>
+              <div class="action-bar palette-actions">
+                <button id="generatePaletteBtn" class="primary-btn" type="button">生成配色</button>
+                <button id="resetPaletteBtn" class="ghost-btn" type="button">重置</button>
+                <button id="copyPaletteCssBtn" class="ghost-btn" type="button">复制 CSS 变量</button>
+                <button id="copyPaletteJsonBtn" class="ghost-btn" type="button">复制 JSON</button>
+              </div>
+              <div id="paletteStatus" class="status-message hidden"></div>
+            </div>
+
+            <div class="palette-output">
+              <div class="section-head compact">
+                <div>
+                  <p class="section-tag">Palette</p>
+                  <h2>推荐色板</h2>
+                </div>
+              </div>
+              <div id="paletteSwatches" class="palette-swatches"></div>
+              <div class="palette-copy-grid">
+                <label class="field">
+                  <span>CSS 变量</span>
+                  <textarea id="paletteCssOutput" rows="8" readonly></textarea>
+                </label>
+                <label class="field">
+                  <span>设计建议</span>
+                  <textarea id="paletteGuideOutput" rows="8" readonly></textarea>
+                </label>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="panel palette-preview-panel">
+          <div class="section-head compact">
+            <div>
+              <p class="section-tag">Preview</p>
+              <h2>界面预览</h2>
+            </div>
+          </div>
+          <div id="palettePreview" class="palette-preview">
+            <div class="preview-sidebar">
+              <strong id="palettePreviewBrand">AI Console</strong>
+              <span id="palettePreviewNavPrimary">Dashboard</span>
+              <span id="palettePreviewNavSecondary">Models</span>
+              <span id="palettePreviewNavTertiary">Settings</span>
+            </div>
+            <div class="preview-main">
+              <div class="preview-hero-card">
+                <small id="palettePreviewKicker">智能推荐</small>
+                <h3 id="palettePreviewTitle">让产品界面保持一致的视觉语言</h3>
+                <p id="palettePreviewText">通过主色、辅助色、背景色和文字色，快速预览一套完整网页配色。</p>
+                <button id="palettePreviewAction" type="button">主要行动</button>
+              </div>
+              <div class="preview-metrics">
+                <article><span>Primary</span><strong>86%</strong></article>
+                <article><span>Accent</span><strong>42k</strong></article>
+                <article><span>Contrast</span><strong>AA</strong></article>
+              </div>
+            </div>
           </div>
         </section>
       </main>
@@ -299,6 +436,6 @@
       </article>
     </template>
 
-    <script defer src="./app.js"></script>
+    <script type="module" src="./app.js"></script>
   </body>
 </html>

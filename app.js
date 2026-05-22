@@ -1,10 +1,50 @@
+import { hexToHsl, hexToRgb, hslToHex, readableTextColor } from "./src/shared/color.js";
+import { escapeHtml, formatMs, formatNumber, prettyJson, shorten, timestampString } from "./src/shared/format.js";
+import { deepMerge, parseJsonObject } from "./src/shared/object.js";
+import { average, numericSort, percentile, roughTokenEstimate } from "./src/shared/stats.js";
+import { getStorageItem, removeStorageItem, setStorageItem } from "./src/shared/storage.js";
+import { joinUrl, shouldUseProxy } from "./src/shared/url.js";
+import { normalizeErrorMessage, parseFloatOrThrow, parseNonNegativeInt, parsePositiveInt, safeReadText } from "./src/shared/validation.js";
+import { getToolIds } from "./src/core/registry.js";
+
 const STORAGE_KEY = "llm-speed-bench-static-v1";
 const DEFAULT_VIEW = "home";
+const DEFAULT_PALETTE = {
+  style: "tech",
+  preset: "sakura",
+  baseColor: "#2563eb",
+};
 
 const dom = {
   homeView: document.querySelector("#homeView"),
   speedTestView: document.querySelector("#speedTestView"),
+  colorPaletteView: document.querySelector("#colorPaletteView"),
   viewLinks: document.querySelectorAll("[data-view-link]"),
+  paletteStyleInput: document.querySelector("#paletteStyleInput"),
+  palettePresetInput: document.querySelector("#palettePresetInput"),
+  paletteBaseColorInput: document.querySelector("#paletteBaseColorInput"),
+  paletteBaseColorTextInput: document.querySelector("#paletteBaseColorTextInput"),
+  paletteBaseColorPreview: document.querySelector("#paletteBaseColorPreview"),
+  paletteAutoModeBtn: document.querySelector("#paletteAutoModeBtn"),
+  palettePresetModeBtn: document.querySelector("#palettePresetModeBtn"),
+  palettePresetTabs: document.querySelector("#palettePresetTabs"),
+  generatePaletteBtn: document.querySelector("#generatePaletteBtn"),
+  resetPaletteBtn: document.querySelector("#resetPaletteBtn"),
+  copyPaletteCssBtn: document.querySelector("#copyPaletteCssBtn"),
+  copyPaletteJsonBtn: document.querySelector("#copyPaletteJsonBtn"),
+  paletteStatus: document.querySelector("#paletteStatus"),
+  paletteSwatches: document.querySelector("#paletteSwatches"),
+  paletteCssOutput: document.querySelector("#paletteCssOutput"),
+  paletteGuideOutput: document.querySelector("#paletteGuideOutput"),
+  palettePreview: document.querySelector("#palettePreview"),
+  palettePreviewBrand: document.querySelector("#palettePreviewBrand"),
+  palettePreviewNavPrimary: document.querySelector("#palettePreviewNavPrimary"),
+  palettePreviewNavSecondary: document.querySelector("#palettePreviewNavSecondary"),
+  palettePreviewNavTertiary: document.querySelector("#palettePreviewNavTertiary"),
+  palettePreviewKicker: document.querySelector("#palettePreviewKicker"),
+  palettePreviewTitle: document.querySelector("#palettePreviewTitle"),
+  palettePreviewText: document.querySelector("#palettePreviewText"),
+  palettePreviewAction: document.querySelector("#palettePreviewAction"),
   promptInput: document.querySelector("#promptInput"),
   systemPromptInput: document.querySelector("#systemPromptInput"),
   roundsInput: document.querySelector("#roundsInput"),
@@ -35,6 +75,7 @@ const dom = {
 
 let currentAbortController = null;
 let latestExportPayload = null;
+let latestPalettePayload = null;
 
 bootstrap();
 
@@ -50,6 +91,9 @@ function bootstrap() {
   if (!dom.targetsContainer.children.length) {
     addTargetCard({ kind: "openai" });
   }
+  renderPalettePresetTabs();
+  setPaletteMode("auto", false);
+  generatePalette();
   syncExportButton();
 }
 
@@ -61,6 +105,22 @@ function bindEvents() {
   dom.addOpenAiBtn.addEventListener("click", () => addTargetCard({ kind: "openai" }));
   dom.addAnthropicBtn.addEventListener("click", () => addTargetCard({ kind: "anthropic" }));
   dom.addOllamaBtn.addEventListener("click", () => addTargetCard({ kind: "ollama" }));
+  dom.paletteAutoModeBtn.addEventListener("click", () => setPaletteMode("auto"));
+  dom.palettePresetModeBtn.addEventListener("click", () => setPaletteMode("preset"));
+  dom.generatePaletteBtn.addEventListener("click", generatePalette);
+  dom.resetPaletteBtn.addEventListener("click", resetPalette);
+  dom.copyPaletteCssBtn.addEventListener("click", () => copyPaletteText(dom.paletteCssOutput.value, "CSS 变量已复制。"));
+  dom.copyPaletteJsonBtn.addEventListener("click", () => copyPaletteText(JSON.stringify(latestPalettePayload, null, 2), "JSON 已复制。"));
+  dom.paletteStyleInput.addEventListener("input", generatePalette);
+  dom.paletteStyleInput.addEventListener("change", generatePalette);
+  dom.paletteBaseColorInput.addEventListener("input", () => syncBaseColor(dom.paletteBaseColorInput.value));
+  dom.paletteBaseColorInput.addEventListener("change", () => syncBaseColor(dom.paletteBaseColorInput.value));
+  dom.paletteBaseColorTextInput.addEventListener("input", () => syncBaseColorText(dom.paletteBaseColorTextInput.value));
+  dom.paletteBaseColorTextInput.addEventListener("change", () => syncBaseColorText(dom.paletteBaseColorTextInput.value));
+  dom.palettePresetInput.addEventListener("change", () => {
+    setPaletteMode("preset", false);
+    generatePalette();
+  });
   dom.exampleBtn.addEventListener("click", fillExampleConfig);
   dom.resetBtn.addEventListener("click", resetPage);
   dom.runBtn.addEventListener("click", runBenchmark);
@@ -88,12 +148,437 @@ function syncViewFromHash() {
 }
 
 function showView(view) {
-  const normalizedView = view === "speed-test" ? "speed-test" : DEFAULT_VIEW;
+  const normalizedView = getToolIds().includes(view) ? view : DEFAULT_VIEW;
   dom.homeView.classList.toggle("hidden", normalizedView !== "home");
   dom.speedTestView.classList.toggle("hidden", normalizedView !== "speed-test");
+  dom.colorPaletteView.classList.toggle("hidden", normalizedView !== "color-palette");
   dom.viewLinks.forEach((link) => {
     link.classList.toggle("active", link.dataset.viewLink === normalizedView);
   });
+}
+
+function setPaletteMode(mode, shouldGenerate = true) {
+  const normalizedMode = mode === "preset" ? "preset" : "auto";
+  dom.palettePresetInput.value = normalizedMode === "preset" && dom.palettePresetInput.value
+    ? dom.palettePresetInput.value
+    : "";
+  dom.paletteAutoModeBtn.classList.toggle("active", normalizedMode === "auto");
+  dom.palettePresetModeBtn.classList.toggle("active", normalizedMode === "preset");
+  dom.palettePresetTabs.classList.toggle("hidden", normalizedMode !== "preset");
+  document.querySelectorAll(".palette-auto-field").forEach((element) => {
+    element.classList.toggle("hidden", normalizedMode !== "auto");
+  });
+  if (normalizedMode === "preset" && !dom.palettePresetInput.value) {
+    dom.palettePresetInput.value = DEFAULT_PALETTE.preset;
+  }
+  syncPalettePresetTabs();
+  if (shouldGenerate) {
+    generatePalette();
+  }
+}
+
+function syncBaseColor(hex) {
+  const normalizedHex = normalizeHexColor(hex);
+  if (!normalizedHex) {
+    return;
+  }
+  dom.paletteBaseColorInput.value = normalizedHex;
+  dom.paletteBaseColorTextInput.value = normalizedHex;
+  dom.paletteBaseColorPreview.style.setProperty("--selected-color", normalizedHex);
+  generatePalette();
+}
+
+function syncBaseColorText(value) {
+  const normalizedHex = normalizeHexColor(value);
+  if (!normalizedHex) {
+    return;
+  }
+  syncBaseColor(normalizedHex);
+}
+
+function normalizeHexColor(value) {
+  const raw = value.trim();
+  const hex = raw.startsWith("#") ? raw : `#${raw}`;
+  return /^#[0-9a-f]{6}$/i.test(hex) ? hex.toUpperCase() : null;
+}
+
+function generatePalette() {
+  const style = dom.paletteStyleInput.value;
+  const preset = dom.palettePresetInput.value;
+  const baseHex = dom.paletteBaseColorInput.value;
+  const baseHsl = hexToHsl(baseHex);
+  const styleConfig = paletteStyleConfig(style);
+  const presetConfig = palettePresetConfig(preset);
+  const colors = presetConfig
+    ? buildPresetPalette(presetConfig)
+    : buildGeneratedPalette(baseHsl, styleConfig);
+
+  const css = buildPaletteCss(colors);
+  const guide = buildPaletteGuide(presetConfig?.name || styleConfig.name, colors, Boolean(presetConfig));
+  latestPalettePayload = {
+    style: presetConfig?.name || styleConfig.name,
+    mode: presetConfig ? "preset" : "generated",
+    colors,
+    cssVariables: Object.fromEntries(colors.map((color) => [`--color-${color.role}`, color.hex])),
+  };
+
+  renderPaletteSwatches(colors);
+  dom.paletteCssOutput.value = css;
+  dom.paletteGuideOutput.value = guide;
+  applyPalettePreview(colors);
+}
+
+function renderPalettePresetTabs() {
+  const presets = palettePresetConfig();
+  dom.palettePresetTabs.innerHTML = Object.entries(presets)
+    .map(([id, preset]) => `
+      <button class="palette-preset-tab" type="button" data-palette-preset="${id}">
+        <span class="preset-color-row">
+          ${preset.colors.slice(0, 5).map((color) => `<i style="--preset-color:${color.hex}"></i>`).join("")}
+        </span>
+        <strong>${escapeHtml(preset.name)}</strong>
+      </button>
+    `)
+    .join("");
+  dom.palettePresetTabs.querySelectorAll("[data-palette-preset]").forEach((button) => {
+    button.addEventListener("click", () => {
+      dom.palettePresetInput.value = button.dataset.palettePreset;
+      setPaletteMode("preset");
+    });
+  });
+  syncPalettePresetTabs();
+}
+
+function syncPalettePresetTabs() {
+  dom.palettePresetTabs.querySelectorAll("[data-palette-preset]").forEach((button) => {
+    button.classList.toggle("active", button.dataset.palettePreset === dom.palettePresetInput.value);
+  });
+}
+
+function resetPalette() {
+  dom.paletteStyleInput.value = DEFAULT_PALETTE.style;
+  dom.palettePresetInput.value = "";
+  syncBaseColor(DEFAULT_PALETTE.baseColor);
+  setPaletteMode("auto", false);
+  generatePalette();
+  showPaletteStatus("已恢复默认配色参数。", "info");
+}
+
+function buildGeneratedPalette(baseHsl, styleConfig) {
+  const colors = [
+    paletteColor("primary", "主色", hslToHex(baseHsl.h, styleConfig.primaryS, styleConfig.primaryL), "主按钮、链接、关键高亮"),
+    paletteColor("secondary", "辅助色", hslToHex(baseHsl.h + styleConfig.secondaryShift, styleConfig.secondaryS, styleConfig.secondaryL), "标签、图表、辅助按钮"),
+    paletteColor("accent", "强调色", hslToHex(baseHsl.h + styleConfig.accentShift, styleConfig.accentS, styleConfig.accentL), "活动状态、徽标、重点提醒"),
+    paletteColor("background", "背景色", hslToHex(baseHsl.h + styleConfig.bgShift, styleConfig.bgS, styleConfig.bgL), "页面背景、大面积留白"),
+    paletteColor("surface", "卡片色", hslToHex(baseHsl.h + styleConfig.surfaceShift, styleConfig.surfaceS, styleConfig.surfaceL), "卡片、面板、输入区域"),
+  ];
+  const textHex = readableTextColor(colors[3].hex);
+  const mutedHex = hslToHex(baseHsl.h, 16, textHex === "#FFFFFF" ? 78 : 38);
+  colors.push(paletteColor("text", "文字色", textHex === "#FFFFFF" ? "#F8FAFC" : "#10202B", "标题和正文"));
+  colors.push(paletteColor("muted", "弱文字", mutedHex, "说明文字、次级信息"));
+  return colors;
+}
+
+function buildPresetPalette(preset) {
+  const colors = preset.colors.map((color) => paletteColor(color.role, color.label, color.hex, color.usage));
+  colors.push(paletteColor("text", "文字色", preset.text, "标题和正文"));
+  colors.push(paletteColor("muted", "弱文字", preset.muted, "说明文字、次级信息"));
+  return colors;
+}
+
+function paletteColor(role, label, hex, usage) {
+  const rgb = hexToRgb(hex);
+  const hsl = hexToHsl(hex);
+  return {
+    role,
+    label,
+    hex,
+    rgb: `rgb(${rgb.r}, ${rgb.g}, ${rgb.b})`,
+    hsl: `hsl(${Math.round(hsl.h)}, ${Math.round(hsl.s)}%, ${Math.round(hsl.l)}%)`,
+    usage,
+  };
+}
+
+function paletteStyleConfig(style) {
+  const configs = {
+    tech: { name: "科技冷静", primaryS: 76, primaryL: 54, secondaryShift: 78, secondaryS: 64, secondaryL: 45, accentShift: -42, accentS: 82, accentL: 58, bgShift: 8, bgS: 42, bgL: 96, surfaceShift: 4, surfaceS: 36, surfaceL: 100 },
+    warm: { name: "温暖友好", primaryS: 72, primaryL: 52, secondaryShift: 34, secondaryS: 70, secondaryL: 62, accentShift: -24, accentS: 78, accentL: 60, bgShift: 18, bgS: 58, bgL: 95, surfaceShift: 12, surfaceS: 50, surfaceL: 99 },
+    fresh: { name: "清爽自然", primaryS: 62, primaryL: 46, secondaryShift: 42, secondaryS: 54, secondaryL: 50, accentShift: 96, accentS: 58, accentL: 56, bgShift: 36, bgS: 48, bgL: 96, surfaceShift: 28, surfaceS: 42, surfaceL: 99 },
+    luxury: { name: "高级克制", primaryS: 42, primaryL: 34, secondaryShift: 28, secondaryS: 36, secondaryL: 48, accentShift: -36, accentS: 48, accentL: 44, bgShift: 8, bgS: 22, bgL: 94, surfaceShift: 5, surfaceS: 18, surfaceL: 98 },
+    cyber: { name: "赛博活力", primaryS: 88, primaryL: 58, secondaryShift: 118, secondaryS: 86, secondaryL: 54, accentShift: -86, accentS: 90, accentL: 62, bgShift: 220, bgS: 28, bgL: 10, surfaceShift: 220, surfaceS: 24, surfaceL: 16 },
+  };
+  return configs[style] || configs.tech;
+}
+
+function palettePresetConfig(preset) {
+  const presets = {
+    sakura: {
+      name: "雾白深蓝",
+      text: "#1F2937",
+      muted: "#667085",
+      colors: [
+        { role: "primary", label: "Deep Blue", hex: "#2563EB", usage: "主按钮、链接、导航选中" },
+        { role: "secondary", label: "Sky Mist", hex: "#DBEAFE", usage: "标签底色、辅助模块" },
+        { role: "accent", label: "Soft Cyan", hex: "#06B6D4", usage: "数据高亮、轻量强调" },
+        { role: "background", label: "Cloud White", hex: "#F8FAFC", usage: "清爽页面背景" },
+        { role: "surface", label: "Pure Surface", hex: "#FFFFFF", usage: "卡片、输入、弹窗" },
+      ],
+    },
+    bamboo: {
+      name: "鼠尾草奶油",
+      text: "#24352F",
+      muted: "#6B7A72",
+      colors: [
+        { role: "primary", label: "Sage", hex: "#5F8D73", usage: "自然主按钮、品牌识别" },
+        { role: "secondary", label: "Pale Sage", hex: "#D8E7DD", usage: "标签、信息块背景" },
+        { role: "accent", label: "Warm Sand", hex: "#D6A96A", usage: "小面积强调、徽标" },
+        { role: "background", label: "Cream", hex: "#F7F3EA", usage: "柔和页面背景" },
+        { role: "surface", label: "Soft Linen", hex: "#FFFCF6", usage: "卡片、表单、浮层" },
+      ],
+    },
+    porcelain: {
+      name: "冷雾青瓷",
+      text: "#20313A",
+      muted: "#607D87",
+      colors: [
+        { role: "primary", label: "Porcelain Teal", hex: "#2F8F9D", usage: "主按钮、链接、导航" },
+        { role: "secondary", label: "Mist Blue", hex: "#D7E9ED", usage: "次级区域、提示背景" },
+        { role: "accent", label: "Lake Blue", hex: "#6D9DC5", usage: "图表、数据高亮" },
+        { role: "background", label: "Blue Fog", hex: "#F2F7F8", usage: "低眩光页面背景" },
+        { role: "surface", label: "Ice Surface", hex: "#FFFFFF", usage: "内容卡片、输入区域" },
+      ],
+    },
+    sunset: {
+      name: "杏仁暖阳",
+      text: "#3F332A",
+      muted: "#7C6656",
+      colors: [
+        { role: "primary", label: "Terracotta", hex: "#C96F4A", usage: "温暖主按钮、品牌色" },
+        { role: "secondary", label: "Apricot", hex: "#F4C7A1", usage: "标签、辅助按钮" },
+        { role: "accent", label: "Honey", hex: "#E7A84B", usage: "重点提醒、小面积点缀" },
+        { role: "background", label: "Almond", hex: "#FAF1E6", usage: "温润页面背景" },
+        { role: "surface", label: "Warm White", hex: "#FFF8F0", usage: "卡片、弹窗、内容容器" },
+      ],
+    },
+    ink: {
+      name: "炭黑云灰",
+      text: "#111827",
+      muted: "#6B7280",
+      colors: [
+        { role: "primary", label: "Charcoal", hex: "#111827", usage: "高级主按钮、标题强调" },
+        { role: "secondary", label: "Cool Gray", hex: "#E5E7EB", usage: "分割区域、辅助背景" },
+        { role: "accent", label: "Clean Indigo", hex: "#6366F1", usage: "链接、重点操作" },
+        { role: "background", label: "Snow Gray", hex: "#F9FAFB", usage: "干净页面背景" },
+        { role: "surface", label: "White Panel", hex: "#FFFFFF", usage: "卡片、面板、输入" },
+      ],
+    },
+    cream: {
+      name: "奶油玫瑰",
+      text: "#443137",
+      muted: "#8B6F78",
+      colors: [
+        { role: "primary", label: "Rose Taupe", hex: "#A55C6B", usage: "柔和主按钮、品牌识别" },
+        { role: "secondary", label: "Blush", hex: "#F3D7DC", usage: "辅助按钮、信息底色" },
+        { role: "accent", label: "Peach", hex: "#E7A08B", usage: "强调按钮、提示状态" },
+        { role: "background", label: "Cream Rose", hex: "#FFF5F3", usage: "页面背景、营销区块" },
+        { role: "surface", label: "Soft White", hex: "#FFFFFF", usage: "卡片、浮层、表单区域" },
+      ],
+    },
+    softNeutral: {
+      name: "现代办公",
+      text: "#1F2937",
+      muted: "#6B7280",
+      colors: [
+        { role: "primary", label: "Office Blue", hex: "#3B82F6", usage: "主按钮、链接、当前导航" },
+        { role: "secondary", label: "Slate Soft", hex: "#E2E8F0", usage: "次级按钮、分割区域" },
+        { role: "accent", label: "Teal Fresh", hex: "#14B8A6", usage: "成功状态、轻量强调" },
+        { role: "background", label: "Workspace", hex: "#F5F7FA", usage: "低眩光页面背景" },
+        { role: "surface", label: "Clean Surface", hex: "#FFFFFF", usage: "卡片、输入、数据面板" },
+      ],
+    },
+    warmReading: {
+      name: "暖纸阅读",
+      text: "#2F2A24",
+      muted: "#7A6B5C",
+      colors: [
+        { role: "primary", label: "Walnut", hex: "#7C4A2D", usage: "文章链接、主操作" },
+        { role: "secondary", label: "Paper Beige", hex: "#EFE4D2", usage: "次级背景、提示容器" },
+        { role: "accent", label: "Olive Gold", hex: "#A78B4F", usage: "引导提示、小面积强调" },
+        { role: "background", label: "Paper White", hex: "#FBF7EF", usage: "长阅读背景" },
+        { role: "surface", label: "Cream Panel", hex: "#FFFDF8", usage: "卡片、侧栏、目录" },
+      ],
+    },
+    pastelFocus: {
+      name: "薰衣草雾",
+      text: "#312E5C",
+      muted: "#6E6A93",
+      colors: [
+        { role: "primary", label: "Lavender", hex: "#7C6FF6", usage: "轻量主按钮、聚焦状态" },
+        { role: "secondary", label: "Lilac Mist", hex: "#E9E5FF", usage: "分组背景、信息区域" },
+        { role: "accent", label: "Soft Pink", hex: "#F0A6CA", usage: "CTA、提醒、徽标" },
+        { role: "background", label: "Cloud Lilac", hex: "#FAF9FF", usage: "干净页面背景" },
+        { role: "surface", label: "White Lilac", hex: "#FFFFFF", usage: "卡片、筛选区域" },
+      ],
+    },
+    solarizedLight: {
+      name: "海盐薄荷",
+      text: "#163B3A",
+      muted: "#5F7F7D",
+      colors: [
+        { role: "primary", label: "Deep Mint", hex: "#0F766E", usage: "链接、主按钮、信息状态" },
+        { role: "secondary", label: "Mint Wash", hex: "#CCFBF1", usage: "成功状态、辅助强调" },
+        { role: "accent", label: "Coral", hex: "#FB7185", usage: "重点标记、提示" },
+        { role: "background", label: "Sea Salt", hex: "#F0FDFA", usage: "舒适页面背景" },
+        { role: "surface", label: "Foam", hex: "#FFFFFF", usage: "卡片、代码块、面板" },
+      ],
+    },
+    nordCalm: {
+      name: "北境冰蓝",
+      text: "#1E293B",
+      muted: "#64748B",
+      colors: [
+        { role: "primary", label: "Frost Blue", hex: "#4F7CAC", usage: "主按钮、链接、选中状态" },
+        { role: "secondary", label: "Ice Blue", hex: "#DCEBFA", usage: "图表、辅助按钮" },
+        { role: "accent", label: "Aurora", hex: "#9B8AFB", usage: "柔和强调、装饰元素" },
+        { role: "background", label: "Snow", hex: "#F4F7FB", usage: "低噪声页面背景" },
+        { role: "surface", label: "Ice Surface", hex: "#FFFFFF", usage: "卡片、面板、输入区域" },
+      ],
+    },
+    softIvory: {
+      name: "月光石灰",
+      text: "#26313D",
+      muted: "#718096",
+      colors: [
+        { role: "primary", label: "Moon Slate", hex: "#3A4A5F", usage: "标题、导航、主操作" },
+        { role: "secondary", label: "Stone Mist", hex: "#E6EAF0", usage: "次级按钮、分组背景" },
+        { role: "accent", label: "Calm Blue", hex: "#7BA7C7", usage: "链接、轻量强调" },
+        { role: "background", label: "Moon White", hex: "#F6F7F9", usage: "低噪声页面背景" },
+        { role: "surface", label: "Clean White", hex: "#FFFFFF", usage: "卡片、表格、输入区域" },
+      ],
+    },
+    sageStone: {
+      name: "森林雾绿",
+      text: "#1F352D",
+      muted: "#687A70",
+      colors: [
+        { role: "primary", label: "Forest", hex: "#2F6B4F", usage: "品牌主色、主要按钮" },
+        { role: "secondary", label: "Sage Wash", hex: "#DDEADF", usage: "标签、辅助区域" },
+        { role: "accent", label: "Clay Gold", hex: "#C6A15B", usage: "徽标、重点数据" },
+        { role: "background", label: "Moss White", hex: "#F4F8F3", usage: "自然舒缓背景" },
+        { role: "surface", label: "Leaf White", hex: "#FFFFFF", usage: "卡片、弹窗、表单" },
+      ],
+    },
+    mistBlue: {
+      name: "深海浅蓝",
+      text: "#172A3A",
+      muted: "#607487",
+      colors: [
+        { role: "primary", label: "Ocean", hex: "#1D6F8F", usage: "主按钮、导航、链接" },
+        { role: "secondary", label: "Aqua Mist", hex: "#D8EEF4", usage: "提示背景、辅助按钮" },
+        { role: "accent", label: "Sea Coral", hex: "#EF8E7D", usage: "重点提醒、小面积点缀" },
+        { role: "background", label: "Sea Foam", hex: "#F3FAFC", usage: "清爽页面背景" },
+        { role: "surface", label: "White Wave", hex: "#FFFFFF", usage: "数据卡片、输入面板" },
+      ],
+    },
+    oatCoffee: {
+      name: "可可燕麦",
+      text: "#3A2D28",
+      muted: "#7C685F",
+      colors: [
+        { role: "primary", label: "Cocoa", hex: "#6B4636", usage: "生活方式主色、标题" },
+        { role: "secondary", label: "Oat", hex: "#E8D8C3", usage: "按钮、标签、筛选项" },
+        { role: "accent", label: "Blue Gray", hex: "#6F8AA3", usage: "信息状态、链接" },
+        { role: "background", label: "Oat Milk", hex: "#FAF4EA", usage: "温暖低疲劳背景" },
+        { role: "surface", label: "Cream Foam", hex: "#FFFDF8", usage: "卡片、内容容器" },
+      ],
+    },
+    creamApricot: {
+      name: "蜜桃奶油",
+      text: "#4A2F2A",
+      muted: "#8A6B64",
+      colors: [
+        { role: "primary", label: "Peach", hex: "#D87A66", usage: "主按钮、品牌识别" },
+        { role: "secondary", label: "Cream Peach", hex: "#F8D8CB", usage: "辅助背景、标签" },
+        { role: "accent", label: "Berry", hex: "#B65C7A", usage: "温柔提醒、徽标" },
+        { role: "background", label: "Peach White", hex: "#FFF6F2", usage: "柔和页面背景" },
+        { role: "surface", label: "Milk White", hex: "#FFFFFF", usage: "卡片、输入、浮层" },
+      ],
+    },
+    pearlMist: {
+      name: "珍珠紫灰",
+      text: "#2D2A3D",
+      muted: "#77738A",
+      colors: [
+        { role: "primary", label: "Pearl Purple", hex: "#6D5BD0", usage: "标题、导航、主操作" },
+        { role: "secondary", label: "Purple Mist", hex: "#E7E3FF", usage: "辅助按钮、边框" },
+        { role: "accent", label: "Soft Mint", hex: "#7BCDBA", usage: "轻量高亮、图表" },
+        { role: "background", label: "Pearl White", hex: "#FAFAFF", usage: "清爽应用背景" },
+        { role: "surface", label: "White Pearl", hex: "#FFFFFF", usage: "数据面板、列表" },
+      ],
+    },
+  };
+  return preset === undefined ? presets : presets[preset] || null;
+}
+
+function renderPaletteSwatches(colors) {
+  dom.paletteSwatches.innerHTML = colors
+    .map(
+      (color) => `
+        <article class="palette-swatch" style="--swatch-color:${color.hex}">
+          <span class="swatch-chip"></span>
+          <strong>${escapeHtml(color.label)}</strong>
+          <div class="swatch-copy-row">
+            <button class="swatch-copy-btn" type="button" data-copy-color="${color.hex}" data-copy-label="HEX">HEX ${color.hex}</button>
+            <button class="swatch-copy-btn" type="button" data-copy-color="${escapeHtml(color.rgb)}" data-copy-label="RGB">RGB ${escapeHtml(color.rgb)}</button>
+          </div>
+          <small>${escapeHtml(color.usage)}</small>
+        </article>
+      `,
+    )
+    .join("");
+
+  dom.paletteSwatches.querySelectorAll("[data-copy-color]").forEach((button) => {
+    button.addEventListener("click", () => copyPaletteText(button.dataset.copyColor, `${button.dataset.copyLabel} 已复制：${button.dataset.copyColor}`));
+  });
+}
+
+function buildPaletteCss(colors) {
+  return `:root {\n${colors.map((color) => `  --color-${color.role}: ${color.hex};`).join("\n")}\n}`;
+}
+
+function buildPaletteGuide(styleName, colors, isPreset) {
+  const primary = colors.find((color) => color.role === "primary");
+  const accent = colors.find((color) => color.role === "accent");
+  const background = colors.find((color) => color.role === "background");
+  return [
+    `${isPreset ? "精选方案" : "生成风格"}：${styleName}`,
+    `建议比例：背景 ${background.hex} 使用 60%，主色 ${primary.hex} 使用 30%，强调色 ${accent.hex} 控制在 10% 以内。`,
+    "主色用于关键按钮和链接，辅助色用于图表或次级操作，强调色只用于提醒、徽标和关键数据。",
+    "如果用于正式产品页，建议再根据品牌资产微调饱和度，并检查真实文本的对比度。",
+  ].join("\n");
+}
+
+function applyPalettePreview(colors) {
+  colors.forEach((color) => {
+    dom.palettePreview.style.setProperty(`--preview-${color.role}`, color.hex);
+  });
+}
+
+async function copyPaletteText(text, message) {
+  if (!text) {
+    return;
+  }
+  try {
+    await navigator.clipboard.writeText(text);
+    showPaletteStatus(message, "success");
+  } catch {
+    showPaletteStatus("复制失败，请手动复制文本框内容。", "error");
+  }
+}
+
+function showPaletteStatus(message, level) {
+  dom.paletteStatus.textContent = message;
+  dom.paletteStatus.className = `status-message status-${level}`;
 }
 
 function addTargetCard(initial = {}) {
@@ -189,7 +674,9 @@ function fillExampleConfig() {
 }
 
 function resetPage() {
-  removeStorageItem(STORAGE_KEY);
+  if (!removeStorageItem(STORAGE_KEY)) {
+    log("当前浏览器不允许清理本地缓存。", "error", true);
+  }
   dom.promptInput.value = "";
   dom.systemPromptInput.value = "";
   dom.roundsInput.value = "3";
@@ -913,7 +1400,9 @@ function saveToStorage() {
     })),
   };
 
-  setStorageItem(STORAGE_KEY, JSON.stringify(payload));
+  if (!setStorageItem(STORAGE_KEY, JSON.stringify(payload))) {
+    log("当前浏览器不允许写入本地缓存，页面仍可继续使用。", "error", true);
+  }
 }
 
 function clearResults() {
@@ -1024,13 +1513,6 @@ function normalizeChunkText(value) {
   return "";
 }
 
-function joinUrl(baseUrl, path) {
-  if (/^https?:\/\//i.test(path)) {
-    return path;
-  }
-  return `${baseUrl.replace(/\/+$/, "")}/${path.replace(/^\/+/, "")}`;
-}
-
 function defaultEndpointFor(kind) {
   if (kind === "anthropic") {
     return "/messages";
@@ -1051,133 +1533,6 @@ function typeLabel(kind) {
   return "OpenAI 兼容";
 }
 
-function deepMerge(baseValue, overrideValue) {
-  if (!isPlainObject(baseValue) || !isPlainObject(overrideValue)) {
-    return overrideValue ?? baseValue;
-  }
-
-  const merged = { ...baseValue };
-  for (const [key, value] of Object.entries(overrideValue)) {
-    merged[key] =
-      isPlainObject(value) && isPlainObject(baseValue[key])
-        ? deepMerge(baseValue[key], value)
-        : value;
-  }
-  return merged;
-}
-
-function isPlainObject(value) {
-  return value !== null && typeof value === "object" && !Array.isArray(value);
-}
-
-function average(values) {
-  const filtered = values.filter((value) => Number.isFinite(value));
-  if (!filtered.length) {
-    return null;
-  }
-  return filtered.reduce((sum, value) => sum + value, 0) / filtered.length;
-}
-
-function percentile(values, p) {
-  const filtered = values.filter((value) => Number.isFinite(value)).sort((a, b) => a - b);
-  if (!filtered.length) {
-    return null;
-  }
-  if (filtered.length === 1) {
-    return filtered[0];
-  }
-  const index = (filtered.length - 1) * (p / 100);
-  const lower = Math.floor(index);
-  const upper = Math.ceil(index);
-  if (lower === upper) {
-    return filtered[lower];
-  }
-  return filtered[lower] + (filtered[upper] - filtered[lower]) * (index - lower);
-}
-
-function roughTokenEstimate(text) {
-  if (!text) {
-    return 0;
-  }
-  const cjkCount = (text.match(/[\u3400-\u9fff]/g) || []).length;
-  const otherCount = text.length - cjkCount;
-  return Math.max(1, Math.ceil(cjkCount * 1.1 + otherCount / 4));
-}
-
-function parseJsonObject(text, fieldName) {
-  if (!text) {
-    return {};
-  }
-  try {
-    const parsed = JSON.parse(text);
-    if (!isPlainObject(parsed)) {
-      throw new Error("必须是 JSON 对象");
-    }
-    return parsed;
-  } catch (error) {
-    throw new Error(`${fieldName} JSON 解析失败：${error.message}`);
-  }
-}
-
-function parsePositiveInt(value, fieldName) {
-  const parsed = Number.parseInt(value, 10);
-  if (!Number.isFinite(parsed) || parsed <= 0) {
-    throw new Error(`${fieldName} 必须是大于 0 的整数。`);
-  }
-  return parsed;
-}
-
-function parseNonNegativeInt(value, fieldName) {
-  const parsed = Number.parseInt(value, 10);
-  if (!Number.isFinite(parsed) || parsed < 0) {
-    throw new Error(`${fieldName} 必须是大于等于 0 的整数。`);
-  }
-  return parsed;
-}
-
-function parseFloatOrThrow(value, fieldName) {
-  const parsed = Number.parseFloat(value);
-  if (!Number.isFinite(parsed)) {
-    throw new Error(`${fieldName} 必须是数字。`);
-  }
-  return parsed;
-}
-
-function formatMs(value) {
-  if (!Number.isFinite(value)) {
-    return "-";
-  }
-  return `${value.toFixed(0)} ms`;
-}
-
-function formatNumber(value) {
-  if (!Number.isFinite(value)) {
-    return "-";
-  }
-  return value.toFixed(2);
-}
-
-function prettyJson(value) {
-  if (!value || !Object.keys(value).length) {
-    return "";
-  }
-  return JSON.stringify(value, null, 2);
-}
-
-function timestampString() {
-  return new Date().toISOString().replace(/[:.]/g, "-");
-}
-
-function normalizeErrorMessage(error) {
-  if (error?.name === "AbortError") {
-    return "请求被手动停止。";
-  }
-  if (error instanceof TypeError) {
-    return "请求失败，可能是跨域限制、网络异常，或接口地址不可达。";
-  }
-  return error?.message || String(error);
-}
-
 function redactSecrets(config) {
   return {
     ...config,
@@ -1186,61 +1541,6 @@ function redactSecrets(config) {
       apiKey: target.apiKey ? "***" : "",
     })),
   };
-}
-
-async function safeReadText(response) {
-  try {
-    const text = await response.text();
-    return text.slice(0, 300);
-  } catch {
-    return "";
-  }
-}
-
-function escapeHtml(value) {
-  return String(value)
-    .replaceAll("&", "&amp;")
-    .replaceAll("<", "&lt;")
-    .replaceAll(">", "&gt;")
-    .replaceAll('"', "&quot;")
-    .replaceAll("'", "&#39;");
-}
-
-function shorten(value, maxLength) {
-  if (value.length <= maxLength) {
-    return value;
-  }
-  return `${value.slice(0, maxLength - 1)}…`;
-}
-
-function numericSort(a, b) {
-  const safeA = Number.isFinite(a) ? a : -Infinity;
-  const safeB = Number.isFinite(b) ? b : -Infinity;
-  return safeA - safeB;
-}
-
-function getStorageItem(key) {
-  try {
-    return window.localStorage.getItem(key);
-  } catch {
-    return null;
-  }
-}
-
-function setStorageItem(key, value) {
-  try {
-    window.localStorage.setItem(key, value);
-  } catch {
-    log("当前浏览器不允许写入本地缓存，页面仍可继续使用。", "error", true);
-  }
-}
-
-function removeStorageItem(key) {
-  try {
-    window.localStorage.removeItem(key);
-  } catch {
-    log("当前浏览器不允许清理本地缓存。", "error", true);
-  }
 }
 
 async function fetchModelList({ kind, baseUrl, apiKey, extraHeaders, modelInput, modelSelect, fetchBtn }) {
@@ -1386,8 +1686,4 @@ async function fetchOllamaModels(baseUrl) {
     .map((item) => item.name || item.model)
     .filter(Boolean)
     .sort();
-}
-
-function shouldUseProxy() {
-  return window.location.protocol === "http:" && window.location.port === "8080";
 }
