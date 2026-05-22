@@ -1,0 +1,304 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>AI 工具箱</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=Noto+Sans+SC:wght@400;500;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <div class="page-shell">
+      <header class="hero">
+        <div class="hero-copy">
+          <p class="eyebrow">AI Toolkit</p>
+          <h1>AI 工具箱</h1>
+          <p class="hero-text">
+            一个可直接发布到 GitHub Pages 的静态工具集合。当前包含大模型速度测试工具，后续可以继续扩展更多子工具。
+          </p>
+        </div>
+        <div class="hero-note">
+          <p>静态工具集合</p>
+          <ul>
+            <li>主页统一导航</li>
+            <li>子工具独立展示</li>
+            <li>适合 GitHub Pages 发布</li>
+          </ul>
+        </div>
+      </header>
+
+      <nav class="tool-tabs" aria-label="工具导航">
+        <a class="tool-tab" href="#home" data-view-link="home">工具首页</a>
+        <a class="tool-tab" href="#speed-test" data-view-link="speed-test">大模型测速</a>
+      </nav>
+
+      <main id="homeView" class="layout tool-view">
+        <section class="panel tools-home-panel">
+          <div class="section-head">
+            <div>
+              <p class="section-tag">Tools</p>
+              <h2>工具导航</h2>
+            </div>
+          </div>
+
+          <div class="tool-grid">
+            <a class="tool-card" href="#speed-test" data-view-link="speed-test">
+              <span class="tool-card-kicker">LLM Speed Bench</span>
+              <strong>大模型速度测试台</strong>
+              <p>对比 OpenAI 兼容接口和 Anthropic 接口的 TTFT、总耗时、tokens/s。</p>
+            </a>
+            <article class="tool-card tool-card-disabled">
+              <span class="tool-card-kicker">Coming Soon</span>
+              <strong>更多工具</strong>
+              <p>后续可以继续添加 Prompt 工具、Token 估算、配置生成等静态子工具。</p>
+            </article>
+          </div>
+        </section>
+      </main>
+
+      <main id="speedTestView" class="layout tool-view hidden">
+        <section class="panel tool-title-panel">
+          <div class="section-head compact">
+            <div>
+              <p class="section-tag">LLM Speed Bench</p>
+              <h2>大模型速度测试台</h2>
+            </div>
+            <a class="ghost-link" href="#home" data-view-link="home">返回工具首页</a>
+          </div>
+          <p class="tip">填写接口地址、获取模型列表，输入测试提示词后即可开始测速。</p>
+        </section>
+
+        <section class="panel settings-panel">
+          <div class="section-head">
+            <div>
+              <p class="section-tag">Step 1</p>
+              <h2>测试参数</h2>
+            </div>
+            <div class="head-actions">
+              <button id="exampleBtn" class="ghost-btn" type="button">填充示例</button>
+              <button id="resetBtn" class="ghost-btn" type="button">清空页面</button>
+            </div>
+          </div>
+
+          <div class="form-grid">
+            <label class="field field-span-4">
+              <span>测试提示词</span>
+              <textarea id="promptInput" rows="5" placeholder="输入所有模型共用的提示词"></textarea>
+            </label>
+
+            <label class="field field-span-4 advanced-field">
+              <span>系统提示词</span>
+              <textarea
+                id="systemPromptInput"
+                rows="3"
+                placeholder="可选；如果不填，就只发 user prompt"
+              ></textarea>
+            </label>
+
+            <label class="field compact-field">
+              <span>正式轮数</span>
+              <input id="roundsInput" type="number" min="1" max="20" value="3" />
+            </label>
+
+            <label class="field advanced-field">
+              <span>预热轮数</span>
+              <input id="warmupInput" type="number" min="0" max="10" value="1" />
+            </label>
+
+            <label class="field advanced-field">
+              <span>最大输出 Token</span>
+              <input id="maxTokensInput" type="number" min="1" max="8192" value="256" />
+            </label>
+
+            <label class="field advanced-field">
+              <span>Temperature</span>
+              <input id="temperatureInput" type="number" min="0" max="2" step="0.1" value="0" />
+            </label>
+          </div>
+        </section>
+
+        <section class="panel targets-panel">
+          <div class="section-head">
+            <div>
+              <p class="section-tag">Step 2</p>
+              <h2>接口列表</h2>
+            </div>
+            <div class="head-actions">
+              <button id="addOpenAiBtn" class="ghost-btn" type="button">添加 OpenAI 兼容</button>
+              <button id="addAnthropicBtn" class="ghost-btn" type="button">添加 Anthropic</button>
+              <button id="addOllamaBtn" class="ghost-btn hidden" type="button">添加 Ollama</button>
+            </div>
+          </div>
+
+          <div id="targetsContainer" class="targets-container"></div>
+        </section>
+
+        <section class="panel action-panel">
+          <div class="section-head compact">
+            <div>
+              <p class="section-tag">Step 3</p>
+              <h2>开始测试</h2>
+            </div>
+          </div>
+
+          <div class="action-bar">
+            <button id="runBtn" class="primary-btn" type="button">开始测速</button>
+            <button id="stopBtn" class="ghost-btn" type="button" disabled>停止</button>
+            <button id="exportBtn" class="ghost-btn" type="button" disabled>导出 JSON</button>
+          </div>
+          <div id="statusMessage" class="status-message hidden"></div>
+
+          <p class="tip">
+            提示：GitHub Pages 会直接从浏览器请求接口，目标接口需要允许跨域；如跨域失败，可本地运行 node server.js 使用代理模式。
+          </p>
+        </section>
+
+        <section class="panel summary-panel">
+          <div class="section-head compact">
+            <div>
+              <p class="section-tag">Summary</p>
+              <h2>汇总结果</h2>
+            </div>
+          </div>
+
+          <div id="summaryEmpty" class="empty-state">
+            还没有测速结果，先配置接口后点击“开始测速”。
+          </div>
+          <div id="summaryBoard" class="summary-board hidden"></div>
+          <div id="summaryTableWrap" class="table-wrap hidden">
+            <table class="result-table">
+              <thead>
+                <tr>
+                  <th>模型</th>
+                  <th>成功</th>
+                  <th>平均 TTFT</th>
+                  <th>P95 总耗时</th>
+                  <th>平均 tokens/s</th>
+                  <th>官方 tokens/s</th>
+                </tr>
+              </thead>
+              <tbody id="summaryTableBody"></tbody>
+            </table>
+          </div>
+        </section>
+
+        <section class="panel details-panel">
+          <div class="section-head compact">
+            <div>
+              <p class="section-tag">Runs</p>
+              <h2>逐轮结果</h2>
+            </div>
+          </div>
+
+          <div id="detailsEmpty" class="empty-state">运行后会在这里展示每一轮明细。</div>
+          <div id="detailsTableWrap" class="table-wrap hidden">
+            <table class="result-table result-table-small">
+              <thead>
+                <tr>
+                  <th>模型</th>
+                  <th>轮次</th>
+                  <th>状态</th>
+                  <th>TTFT</th>
+                  <th>总耗时</th>
+                  <th>输出 Token</th>
+                  <th>tokens/s</th>
+                  <th>说明</th>
+                </tr>
+              </thead>
+              <tbody id="detailsTableBody"></tbody>
+            </table>
+          </div>
+        </section>
+
+        <section class="panel log-panel">
+          <div class="section-head compact">
+            <div>
+              <p class="section-tag">Console</p>
+              <h2>执行日志</h2>
+            </div>
+            <button id="clearLogBtn" class="ghost-btn" type="button">清空日志</button>
+          </div>
+          <pre id="logOutput" class="log-output">等待开始…</pre>
+        </section>
+      </main>
+    </div>
+
+    <template id="targetTemplate">
+      <article class="target-card">
+        <div class="target-top">
+          <label class="toggle">
+            <input class="target-enabled" type="checkbox" checked />
+            <span>启用</span>
+          </label>
+          <div class="target-actions">
+            <span class="target-type-badge"></span>
+            <button class="danger-btn remove-target-btn" type="button">删除</button>
+          </div>
+        </div>
+
+        <div class="form-grid target-grid">
+          <label class="field advanced-field">
+            <span>显示名称</span>
+            <input class="target-name" type="text" placeholder="例如 doubao-pro" />
+          </label>
+
+          <label class="field">
+            <span>接口类型</span>
+            <select class="target-kind">
+              <option value="openai">OpenAI 兼容</option>
+              <option value="anthropic">Anthropic</option>
+              <option value="ollama" class="hidden">Ollama</option>
+            </select>
+          </label>
+
+          <label class="field field-span-2">
+            <span>Base URL</span>
+            <input
+              class="target-base-url"
+              type="text"
+              placeholder="例如 https://api.example.com/v1 或 https://api.anthropic.com/v1"
+            />
+          </label>
+
+          <label class="field field-span-2">
+            <span>模型名</span>
+            <div class="model-select-wrapper">
+              <input class="target-model" type="text" placeholder="例如 gpt-4.1-mini / qwen2.5:7b" />
+              <button class="ghost-btn fetch-models-btn" type="button">获取模型列表</button>
+            </div>
+            <select class="target-model-select hidden">
+              <option value="">-- 选择模型 --</option>
+            </select>
+          </label>
+
+          <label class="field advanced-field">
+            <span>Endpoint Path</span>
+            <input class="target-endpoint-path" type="text" placeholder="/chat/completions 或 /messages" />
+          </label>
+
+          <label class="field field-span-2">
+            <span>API Key</span>
+            <input class="target-api-key" type="password" placeholder="纯前端直连时会保留在当前浏览器内存里" />
+          </label>
+
+          <label class="field field-span-2 advanced-field">
+            <span>额外 Headers(JSON，可选)</span>
+            <textarea class="target-extra-headers" rows="2" placeholder='{"x-foo":"bar"}'></textarea>
+          </label>
+
+          <label class="field field-span-2 advanced-field">
+            <span>额外 Body(JSON，可选)</span>
+            <textarea class="target-extra-body" rows="3" placeholder='{"top_p":0.9}'></textarea>
+          </label>
+        </div>
+      </article>
+    </template>
+
+    <script defer src="./app.js"></script>
+  </body>
+</html>
