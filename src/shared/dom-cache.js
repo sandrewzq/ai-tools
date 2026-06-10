@@ -68,3 +68,40 @@ export const speedTest = {
 export const nav = {
   links: document.querySelectorAll("[data-view-link]"),
 };
+
+// 提示词模板工具
+export const promptTemplates = {
+  view: document.querySelector("#promptTemplatesView"),
+  searchInput: document.querySelector("#promptSearchInput"),
+  categoryTabs: document.querySelector("#promptCategoryTabs"),
+  cardsContainer: document.querySelector("#promptCardsContainer"),
+  emptyState: document.querySelector("#promptEmptyState"),
+  toast: document.querySelector("#promptToast"),
+};
+
+// 文本分块器
+export const textChunker = {
+  view: document.querySelector("#textChunkerView"),
+  textInput: document.querySelector("#chunkerTextInput"),
+  chunkSize: document.querySelector("#chunkerChunkSize"),
+  overlap: document.querySelector("#chunkerOverlap"),
+  splitMode: document.querySelector("#chunkerSplitMode"),
+  chunkBtn: document.querySelector("#chunkerChunkBtn"),
+  resetBtn: document.querySelector("#chunkerResetBtn"),
+  copyAllBtn: document.querySelector("#chunkerCopyAllBtn"),
+  statsContainer: document.querySelector("#chunkerStatsContainer"),
+  chunksContainer: document.querySelector("#chunkerChunksContainer"),
+  toast: document.querySelector("#chunkerToast"),
+};
+
+// 文本比对器
+export const textDiffer = {
+  view: document.querySelector("#textDifferView"),
+  textA: document.querySelector("#differTextA"),
+  textB: document.querySelector("#differTextB"),
+  compareBtn: document.querySelector("#differCompareBtn"),
+  swapBtn: document.querySelector("#differSwapBtn"),
+  resetBtn: document.querySelector("#differResetBtn"),
+  statsContainer: document.querySelector("#differStatsContainer"),
+  diffOutput: document.querySelector("#differDiffOutput"),
+};

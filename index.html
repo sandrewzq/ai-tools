@@ -19,7 +19,7 @@
           <p class="eyebrow">AI Toolkit</p>
           <h1>AI 工具箱</h1>
           <p class="hero-text">
-            一个可直接发布到 GitHub Pages 的静态工具集合。当前包含大模型速度测试工具，后续可以继续扩展更多子工具。
+            一个可直接发布到 GitHub Pages 的静态工具集合，包含大模型测速、配色推荐、提示词模板、文本分块、文本比对等实用工具。
           </p>
         </div>
         <div class="hero-note">
@@ -33,9 +33,12 @@
       </header>
 
       <nav class="tool-tabs" aria-label="工具导航">
-        <a class="tool-tab" href="#home" data-view-link="home">工具首页</a>
+        <a class="tool-tab tool-tab-home" href="#home" data-view-link="home">工具首页</a>
         <a class="tool-tab" href="#speed-test" data-view-link="speed-test">大模型测速</a>
         <a class="tool-tab" href="#color-palette" data-view-link="color-palette">AI 配色推荐</a>
+        <a class="tool-tab" href="#prompt-templates" data-view-link="prompt-templates">提示词模板</a>
+        <a class="tool-tab" href="#text-chunker" data-view-link="text-chunker">文本分块</a>
+        <a class="tool-tab" href="#text-differ" data-view-link="text-differ">文本比对</a>
       </nav>
 
       <main id="homeView" class="layout tool-view">
@@ -58,11 +61,21 @@
               <strong>AI 配色推荐</strong>
               <p>根据场景、风格和主色生成网页可用色板、CSS 变量和界面预览。</p>
             </a>
-            <article class="tool-card tool-card-disabled">
-              <span class="tool-card-kicker">Coming Soon</span>
-              <strong>更多工具</strong>
-              <p>后续可以继续添加 Prompt 工具、Token 估算、配置生成等静态子工具。</p>
-            </article>
+            <a class="tool-card" href="#prompt-templates" data-view-link="prompt-templates">
+              <span class="tool-card-kicker">Prompt Library</span>
+              <strong>提示词模板库</strong>
+              <p>按场景分类的精选中英文提示词模板，支持一键复制和收藏。</p>
+            </a>
+            <a class="tool-card" href="#text-chunker" data-view-link="text-chunker">
+              <span class="tool-card-kicker">Text Chunker</span>
+              <strong>文本分块器</strong>
+              <p>为 RAG 场景提供文本分块，支持按字符/段落/Markdown 标题分割，可调大小和重叠。</p>
+            </a>
+            <a class="tool-card" href="#text-differ" data-view-link="text-differ">
+              <span class="tool-card-kicker">Text Differ</span>
+              <strong>文本比对器</strong>
+              <p>对比两段文本差异，高亮新增/删除/未变行，适合比较 AI 回复或文档版本。</p>
+            </a>
           </div>
         </section>
       </main>
@@ -195,6 +208,153 @@
               </div>
             </div>
           </div>
+        </section>
+      </main>
+
+      <main id="promptTemplatesView" class="layout tool-view hidden">
+        <section class="panel tool-title-panel">
+          <div class="section-head compact">
+            <div>
+              <p class="section-tag">Prompt Library</p>
+              <h2>提示词模板库</h2>
+            </div>
+            <a class="ghost-link" href="#home" data-view-link="home">返回工具首页</a>
+          </div>
+          <p class="tip">浏览精选提示词模板，按场景分类查找，一键复制使用。</p>
+        </section>
+
+        <section class="panel prompt-filter-panel">
+          <div class="prompt-filter-row">
+            <input
+              id="promptSearchInput"
+              class="prompt-search-input"
+              type="text"
+              placeholder="搜索提示词..."
+            />
+          </div>
+          <div id="promptCategoryTabs" class="category-tabs"></div>
+        </section>
+
+        <section class="panel prompt-cards-panel">
+          <div id="promptCardsContainer" class="prompt-cards-grid"></div>
+          <div id="promptEmptyState" class="empty-state hidden">没有匹配的模板。</div>
+        </section>
+
+        <div id="promptToast" class="toast hidden"></div>
+      </main>
+
+      <main id="textChunkerView" class="layout tool-view hidden">
+        <section class="panel tool-title-panel">
+          <div class="section-head compact">
+            <div>
+              <p class="section-tag">Text Chunker</p>
+              <h2>文本分块器</h2>
+            </div>
+            <a class="ghost-link" href="#home" data-view-link="home">返回工具首页</a>
+          </div>
+          <p class="tip">为 RAG / 知识库场景提供文本分块能力，调节参数后点击分块即可预览结果。</p>
+        </section>
+
+        <section class="panel chunker-input-panel">
+          <div class="section-head compact">
+            <div>
+              <p class="section-tag">Input</p>
+              <h2>输入文本</h2>
+            </div>
+          </div>
+          <textarea id="chunkerTextInput" rows="10" placeholder="在此粘贴要分块的文本..."></textarea>
+        </section>
+
+        <section class="panel chunker-config-panel">
+          <div class="section-head compact">
+            <div>
+              <p class="section-tag">Config</p>
+              <h2>分块参数</h2>
+            </div>
+          </div>
+          <div class="chunker-config-row">
+            <label class="field compact-field">
+              <span>分块大小（字符）</span>
+              <input id="chunkerChunkSize" type="number" min="50" max="10000" value="1000" />
+            </label>
+            <label class="field compact-field">
+              <span>重叠大小（字符）</span>
+              <input id="chunkerOverlap" type="number" min="0" max="5000" value="200" />
+            </label>
+            <label class="field compact-field">
+              <span>分割模式</span>
+              <select id="chunkerSplitMode"></select>
+            </label>
+          </div>
+          <div class="action-bar">
+            <button id="chunkerChunkBtn" class="primary-btn" type="button">开始分块</button>
+            <button id="chunkerResetBtn" class="ghost-btn" type="button">重置</button>
+            <button id="chunkerCopyAllBtn" class="ghost-btn" type="button" disabled>复制全部</button>
+          </div>
+        </section>
+
+        <section class="panel chunker-output-panel">
+          <div class="section-head compact">
+            <div>
+              <p class="section-tag">Output</p>
+              <h2>分块结果</h2>
+            </div>
+          </div>
+          <div id="chunkerStatsContainer"></div>
+          <div id="chunkerChunksContainer"></div>
+          <div id="chunkerToast" class="toast hidden"></div>
+        </section>
+      </main>
+
+      <main id="textDifferView" class="layout tool-view hidden">
+        <section class="panel tool-title-panel">
+          <div class="section-head compact">
+            <div>
+              <p class="section-tag">Text Differ</p>
+              <h2>文本比对器</h2>
+            </div>
+            <a class="ghost-link" href="#home" data-view-link="home">返回工具首页</a>
+          </div>
+          <p class="tip">在左右两侧粘贴文本，点击比对后高亮差异。Ctrl+Enter 快捷比对。</p>
+        </section>
+
+        <section class="panel differ-input-panel">
+          <div class="differ-input-grid">
+            <div class="differ-input-side">
+              <div class="section-head compact">
+                <div>
+                  <p class="section-tag">Original</p>
+                  <h2>原文</h2>
+                </div>
+              </div>
+              <textarea id="differTextA" rows="12" placeholder="粘贴原文..."></textarea>
+            </div>
+            <div class="differ-input-side">
+              <div class="section-head compact">
+                <div>
+                  <p class="section-tag">Modified</p>
+                  <h2>修改版</h2>
+                </div>
+              </div>
+              <textarea id="differTextB" rows="12" placeholder="粘贴修改后的文本..."></textarea>
+            </div>
+          </div>
+          <div class="action-bar">
+            <button id="differCompareBtn" class="primary-btn" type="button">开始比对</button>
+            <button id="differSwapBtn" class="ghost-btn" type="button">交换</button>
+            <button id="differResetBtn" class="ghost-btn" type="button">重置</button>
+          </div>
+        </section>
+
+        <section class="panel differ-output-panel">
+          <div class="section-head compact">
+            <div>
+              <p class="section-tag">Diff</p>
+              <h2>比对结果</h2>
+            </div>
+          </div>
+          <div id="differStatsContainer"></div>
+          <div id="differDiffOutput" class="diff-output"></div>
         </section>
       </main>
 

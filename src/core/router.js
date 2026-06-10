@@ -28,6 +28,9 @@ function showView(view, toolsMap) {
     home: "homeView",
     "speed-test": "speedTestView",
     "color-palette": "colorPaletteView",
+    "prompt-templates": "promptTemplatesView",
+    "text-chunker": "textChunkerView",
+    "text-differ": "textDifferView",
   };
   const targetEl = document.getElementById(viewMap[normalizedView]);
   if (targetEl) targetEl.classList.remove("hidden");
