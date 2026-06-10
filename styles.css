@@ -13,6 +13,14 @@
   --radius-lg: 20px;
   --radius-md: 14px;
   --radius-sm: 10px;
+
+  /* 后期工具别名 */
+  --code-bg: #f4f1ea;
+  --border-color: rgba(29, 41, 57, 0.12);
+  --text-primary: #16202b;
+  --text-secondary: #5f6f7f;
+  --accent: #0e7c66;
+  --font-mono: Consolas, "Cascadia Code", "JetBrains Mono", monospace;
 }
 
 * {
@@ -1507,6 +1515,479 @@ button:disabled {
   }
 }
 
+/* ---- cURL 转代码 ---- */
+
+.curl-input-row {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.curl-input {
+  min-height: 100px;
+  font-family: var(--font-mono);
+  font-size: 13px;
+}
+
+.curl-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.curl-hint {
+  font-size: 11px;
+  color: var(--text-secondary);
+  margin-left: auto;
+}
+
+.curl-summary-wrap {
+  margin-top: 10px;
+}
+
+.curl-summary {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.curl-method {
+  font-size: 13px;
+  font-weight: 700;
+  padding: 2px 10px;
+  border-radius: 4px;
+  font-family: var(--font-mono);
+}
+
+.curl-url {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  color: var(--text-primary);
+  word-break: break-all;
+  flex: 1;
+  min-width: 0;
+}
+
+.curl-stat {
+  font-size: 11px;
+  color: var(--text-secondary);
+  background: var(--code-bg);
+  padding: 2px 8px;
+  border-radius: 4px;
+  white-space: nowrap;
+}
+
+.curl-output-panel h3 {
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 10px;
+  color: var(--text-primary);
+}
+
+.curl-code-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+}
+
+.curl-code-card {
+  background: var(--code-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.curl-code-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px;
+  background: rgba(14, 124, 102, 0.06);
+  border-bottom: 1px solid var(--border-color);
+}
+
+.curl-code-lang {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--accent);
+}
+
+.ghost-btn-sm {
+  background: none;
+  border: 1px solid var(--border-color);
+  color: var(--text-secondary);
+  cursor: pointer;
+  font-size: 11px;
+  padding: 2px 8px;
+  border-radius: 4px;
+  transition: all 0.15s;
+}
+
+.ghost-btn-sm:hover {
+  color: var(--accent);
+  border-color: var(--accent);
+}
+
+.curl-code-pre {
+  margin: 0;
+  padding: 12px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--text-primary);
+  white-space: pre-wrap;
+  word-break: break-all;
+  max-height: 340px;
+  overflow-y: auto;
+}
+
+/* ---- 二维码生成器 ---- */
+
+.qr-body {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  align-items: start;
+}
+
+.qr-left {
+  display: flex;
+  flex-direction: column;
+}
+
+.qr-input {
+  min-height: 120px;
+  font-size: 14px;
+}
+
+.qr-right {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+.qr-canvas-wrap {
+  background: #ffffff;
+  border: 2px solid var(--border-color);
+  border-radius: 12px;
+  padding: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 240px;
+}
+
+.qr-canvas {
+  display: none;
+}
+
+.qr-placeholder {
+  color: var(--text-secondary);
+  font-size: 13px;
+}
+
+.qr-info {
+  display: flex;
+  gap: 16px;
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+@media (max-width: 720px) {
+  .curl-code-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .qr-body {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ---- 编码转换器 ---- */
+
+.enc-btn-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 6px;
+}
+
+.enc-io-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin: 14px 0;
+}
+
+.enc-io-side {
+  display: flex;
+  flex-direction: column;
+}
+
+.enc-io-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  margin-bottom: 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.enc-io-side textarea {
+  flex: 1;
+  min-height: 200px;
+}
+
+.enc-main-panel .action-bar {
+  margin-top: 0;
+}
+
+@media (max-width: 720px) {
+  .enc-btn-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .enc-io-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ---- 正则测试器 ---- */
+
+.regex-controls {
+  margin-bottom: 10px;
+}
+
+.regex-pattern-group {
+  display: flex;
+  align-items: center;
+  gap: 0;
+}
+
+.regex-slash {
+  font-size: 18px;
+  color: var(--accent);
+  font-family: var(--font-mono);
+  padding: 0 4px;
+  user-select: none;
+}
+
+.regex-pattern {
+  flex: 1;
+  font-family: var(--font-mono);
+  font-size: 15px;
+}
+
+.regex-flags {
+  width: 60px;
+  font-family: var(--font-mono);
+  font-size: 15px;
+}
+
+.regex-test-text {
+  min-height: 160px;
+}
+
+.regex-match {
+  background: rgba(14, 124, 102, 0.25);
+  border-radius: 3px;
+  padding: 1px 2px;
+  color: inherit;
+}
+
+.regex-highlight {
+  background: var(--code-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  padding: 14px 16px;
+  font-family: var(--font-mono);
+  font-size: 13px;
+  line-height: 1.6;
+  white-space: pre-wrap;
+  word-break: break-all;
+  max-height: 400px;
+  overflow-y: auto;
+  margin: 10px 0;
+}
+
+.regex-matches {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.regex-match-item {
+  background: var(--code-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 10px 14px;
+}
+
+.regex-match-num {
+  font-size: 11px;
+  color: var(--text-secondary);
+  margin-right: 8px;
+}
+
+.regex-match-text {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  color: var(--accent);
+}
+
+.regex-match-pos {
+  font-size: 11px;
+  color: var(--text-secondary);
+  margin-left: 8px;
+}
+
+.regex-groups {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 6px;
+}
+
+.regex-group {
+  background: rgba(14, 124, 102, 0.1);
+  border-radius: 4px;
+  padding: 2px 8px;
+  font-size: 12px;
+}
+
+.regex-group var {
+  font-style: normal;
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.regex-group em {
+  font-style: normal;
+  color: var(--text-primary);
+  font-family: var(--font-mono);
+}
+
+.regex-error {
+  background: rgba(248, 81, 73, 0.1);
+  border: 1px solid rgba(248, 81, 73, 0.3);
+  border-radius: 8px;
+  padding: 10px 14px;
+  color: #f85149;
+  font-size: 13px;
+}
+
+.regex-stats {
+  display: flex;
+  gap: 16px;
+  font-size: 13px;
+  color: var(--text-secondary);
+  margin-bottom: 6px;
+}
+
+.regex-stats strong {
+  color: var(--accent);
+}
+
+/* ---- 时间戳转换器 ---- */
+
+.ts-current {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.ts-current-item {
+  background: var(--code-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 10px 14px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+  min-width: 200px;
+}
+
+.ts-label {
+  font-size: 11px;
+  color: var(--text-secondary);
+  white-space: nowrap;
+}
+
+.ts-value {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  color: var(--text-primary);
+  flex: 1;
+}
+
+.ts-copy {
+  background: none;
+  border: none;
+  color: var(--accent);
+  cursor: pointer;
+  font-size: 12px;
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+.ts-copy:hover {
+  background: rgba(14, 124, 102, 0.1);
+}
+
+.ts-convert-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+.ts-convert-grid h3 {
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 8px;
+  color: var(--text-primary);
+}
+
+.ts-input-row {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-bottom: 10px;
+}
+
+.ts-input-row input {
+  flex: 1;
+  min-width: 120px;
+}
+
+.ts-input-row select {
+  width: auto;
+  min-width: 160px;
+}
+
+.ts-input-row button {
+  white-space: nowrap;
+}
+
+.ts-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+
+.ts-field {
+  background: var(--code-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 8px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
 @media (max-width: 1040px) {
   .hero,
   .summary-board,
@@ -1527,6 +2008,10 @@ button:disabled {
   }
 
   .target-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .ts-convert-grid {
     grid-template-columns: 1fr;
   }
 }
@@ -1563,5 +2048,248 @@ button:disabled {
   .model-select-wrapper .fetch-models-btn {
     width: 100%;
     padding: 10px 14px;
+  }
+
+  .ts-current {
+    flex-direction: column;
+  }
+
+  .ts-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .ts-input-row {
+    flex-direction: column;
+  }
+}
+
+/* ---- UUID 生成器 ---- */
+
+.uuid-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 12px 24px;
+  margin-bottom: 20px;
+}
+
+.uuid-controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 12px 20px;
+  flex: 1 1 auto;
+}
+
+.uuid-check-field {
+  flex-direction: row !important;
+  align-items: center !important;
+  gap: 6px !important;
+}
+
+.uuid-check-field span {
+  font-size: 13px;
+  font-weight: 400;
+  color: var(--text);
+  user-select: none;
+  cursor: pointer;
+}
+
+.uuid-actions {
+  display: flex;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.uuid-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  max-height: 480px;
+  overflow-y: auto;
+}
+
+.uuid-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  background: var(--surface);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  font-family: "Cascadia Code", "Fira Code", monospace;
+  font-size: 13px;
+}
+
+.uuid-row code {
+  flex: 1;
+  word-break: break-all;
+}
+
+.uuid-row .ghost-btn {
+  flex-shrink: 0;
+  font-size: 12px;
+  padding: 4px 10px;
+}
+
+/* ---- 哈希生成器 ---- */
+
+.hash-result {
+  margin-top: 12px;
+}
+
+.hash-result-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 14px;
+  background: var(--surface);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  font-family: "Cascadia Code", "Fira Code", monospace;
+  font-size: 13px;
+}
+
+.hash-algo-tag {
+  flex-shrink: 0;
+  padding: 2px 8px;
+  background: var(--bg-secondary);
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+.hash-value {
+  flex: 1;
+  word-break: break-all;
+}
+
+.hash-placeholder {
+  color: var(--text-secondary);
+  font-size: 13px;
+  text-align: center;
+  padding: 24px 0;
+}
+
+/* ---- JWT 调试器 ---- */
+
+.jwt-output-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  margin-top: 14px;
+}
+
+.jwt-panel {
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.jwt-panel-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 12px;
+  background: var(--bg-secondary);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+.jwt-panel-head .ghost-btn {
+  font-size: 11px;
+  padding: 2px 8px;
+}
+
+.jwt-code-panel {
+  padding: 12px;
+  font-family: "Cascadia Code", "Fira Code", monospace;
+  font-size: 12px;
+  line-height: 1.6;
+  overflow-x: auto;
+  max-height: 300px;
+  overflow-y: auto;
+  background: var(--surface);
+}
+
+.jwt-code {
+  padding: 12px;
+  font-size: 13px;
+  color: var(--text-secondary);
+  min-height: 40px;
+  background: var(--surface);
+}
+
+.jwt-sig-row {
+  margin-top: 12px;
+  padding: 10px 12px;
+  background: var(--bg-secondary);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+.jwt-sig {
+  font-family: "Cascadia Code", "Fira Code", monospace;
+  font-size: 12px;
+  word-break: break-all;
+  color: #f0ab00;
+}
+
+.jwt-verify-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 10px;
+  flex-wrap: wrap;
+}
+
+.jwt-secret-input {
+  flex: 1 1 200px;
+  font-family: "Cascadia Code", "Fira Code", monospace;
+  font-size: 13px;
+}
+
+.jwt-verify-ok {
+  color: #10b981;
+  font-weight: 600;
+  font-size: 13px;
+}
+
+.jwt-verify-fail {
+  color: #f85149;
+  font-size: 13px;
+}
+
+.jwt-verify-hint {
+  color: var(--text-secondary);
+  font-size: 12px;
+}
+
+@media (max-width: 720px) {
+  .jwt-output-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .uuid-toolbar {
+    flex-direction: column;
+  }
+
+  .uuid-controls {
+    flex-direction: column;
+  }
+
+  .jwt-verify-row {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .jwt-secret-input {
+    width: 100%;
   }
 }

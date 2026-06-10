@@ -39,12 +39,10 @@ function bindEvents() {
   dom.colorPalette.resetBtn.addEventListener("click", resetPalette);
   dom.colorPalette.copyCssBtn.addEventListener("click", () => copyPaletteText(dom.colorPalette.cssOutput.value, "CSS 变量已复制。"));
   dom.colorPalette.copyJsonBtn.addEventListener("click", () => copyPaletteText(JSON.stringify(latestPalettePayload, null, 2), "JSON 已复制。"));
-  dom.colorPalette.styleInput.addEventListener("input", generatePalette);
   dom.colorPalette.styleInput.addEventListener("change", generatePalette);
   dom.colorPalette.baseColorInput.addEventListener("input", () => syncBaseColor(dom.colorPalette.baseColorInput.value));
   dom.colorPalette.baseColorInput.addEventListener("change", () => syncBaseColor(dom.colorPalette.baseColorInput.value));
   dom.colorPalette.baseColorTextInput.addEventListener("input", () => syncBaseColorText(dom.colorPalette.baseColorTextInput.value));
-  dom.colorPalette.baseColorTextInput.addEventListener("change", () => syncBaseColorText(dom.colorPalette.baseColorTextInput.value));
   dom.colorPalette.presetInput.addEventListener("change", () => {
     setMode("preset", false);
     generatePalette();
@@ -93,7 +91,9 @@ function syncBaseColor(hex) {
 function syncBaseColorText(value) {
   const normalizedHex = normalizeHexColor(value);
   if (!normalizedHex) return;
-  syncBaseColor(normalizedHex);
+  dom.colorPalette.baseColorInput.value = normalizedHex;
+  dom.colorPalette.baseColorPreview.style.setProperty("--selected-color", normalizedHex);
+  generatePalette();
 }
 
 function normalizeHexColor(value) {
@@ -103,29 +103,46 @@ function normalizeHexColor(value) {
 }
 
 function generatePalette() {
-  const style = dom.colorPalette.styleInput.value;
-  const preset = dom.colorPalette.presetInput.value;
-  const baseHex = dom.colorPalette.baseColorInput.value;
-  const baseHsl = hexToHsl(baseHex);
-  const styleConfig = data.paletteStyleConfig(style);
-  const presetConfig = data.palettePresetConfig(preset);
-  const colors = presetConfig
-    ? data.buildPresetPalette(presetConfig)
-    : data.buildGeneratedPalette(baseHsl, styleConfig);
+  try {
+    const style = dom.colorPalette.styleInput.value;
+    const preset = dom.colorPalette.presetInput.value;
+    const baseHex = dom.colorPalette.baseColorInput.value;
 
-  const css = render.buildPaletteCss(colors);
-  const guide = render.buildPaletteGuide(presetConfig?.name || styleConfig.name, colors, Boolean(presetConfig));
-  latestPalettePayload = {
-    style: presetConfig?.name || styleConfig.name,
-    mode: presetConfig ? "preset" : "generated",
-    colors,
-    cssVariables: Object.fromEntries(colors.map((color) => [`--color-${color.role}`, color.hex])),
-  };
+    if (!/^#[0-9a-f]{6}$/i.test(baseHex)) {
+      showStatus("无效的主色值，请选择一个有效的颜色。", "error");
+      return;
+    }
 
-  render.renderPaletteSwatches(colors, dom.colorPalette.swatches);
-  dom.colorPalette.cssOutput.value = css;
-  dom.colorPalette.guideOutput.value = guide;
-  render.applyPalettePreview(colors, dom.colorPalette.preview);
+    const baseHsl = hexToHsl(baseHex);
+    const styleConfig = data.paletteStyleConfig(style);
+    const presetConfig = data.palettePresetConfig(preset);
+    const colors = presetConfig
+      ? data.buildPresetPalette(presetConfig)
+      : data.buildGeneratedPalette(baseHsl, styleConfig);
+
+    const css = render.buildPaletteCss(colors);
+    const guide = render.buildPaletteGuide(presetConfig?.name || styleConfig.name, colors, Boolean(presetConfig));
+    latestPalettePayload = {
+      style: presetConfig?.name || styleConfig.name,
+      mode: presetConfig ? "preset" : "generated",
+      colors,
+      cssVariables: Object.fromEntries(colors.map((color) => [`--color-${color.role}`, color.hex])),
+    };
+
+    render.renderPaletteSwatches(colors, dom.colorPalette.swatches);
+    dom.colorPalette.cssOutput.value = css;
+    dom.colorPalette.guideOutput.value = guide;
+    dom.colorPalette.preview.style.setProperty("--preview-primary", colors.find(c => c.role === "primary")?.hex || "#2563eb");
+    dom.colorPalette.preview.style.setProperty("--preview-secondary", colors.find(c => c.role === "secondary")?.hex || "#14b8a6");
+    dom.colorPalette.preview.style.setProperty("--preview-accent", colors.find(c => c.role === "accent")?.hex || "#f97316");
+    dom.colorPalette.preview.style.setProperty("--preview-background", colors.find(c => c.role === "background")?.hex || "#f8fafc");
+    dom.colorPalette.preview.style.setProperty("--preview-surface", colors.find(c => c.role === "surface")?.hex || "#ffffff");
+    dom.colorPalette.preview.style.setProperty("--preview-text", colors.find(c => c.role === "text")?.hex || "#10202b");
+    dom.colorPalette.preview.style.setProperty("--preview-muted", colors.find(c => c.role === "muted")?.hex || "#64748b");
+  } catch (err) {
+    console.error("配色生成失败:", err);
+    showStatus(`配色生成失败：${err.message}`, "error");
+  }
 }
 
 function renderPalettePresetTabs() {

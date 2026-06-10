@@ -6,11 +6,10 @@
     <title>AI 工具箱</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=Noto+Sans+SC:wght@400;500;700&display=swap"
-      rel="stylesheet"
-    />
-    <link rel="stylesheet" href="./styles.css?v=7" />
+    <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=Noto+Sans+SC:wght@400;500;700&display=swap" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=Noto+Sans+SC:wght@400;500;700&display=swap" media="print" onload="this.onload=null;this.media='all'" />
+    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=Noto+Sans+SC:wght@400;500;700&display=swap" /></noscript>
+    <link rel="stylesheet" href="./styles.css?v=14" />
   </head>
   <body>
     <div class="page-shell">
@@ -19,7 +18,7 @@
           <p class="eyebrow">AI Toolkit</p>
           <h1>AI 工具箱</h1>
           <p class="hero-text">
-            一个可直接发布到 GitHub Pages 的静态工具集合，包含大模型测速、配色生成器、提示词模板、文本分块、文本比对等实用工具。
+            一个可直接发布到 GitHub Pages 的静态工具集合，包含大模型测速、配色生成、提示词模板、文本分块、文本比对、Token 计算、JSON 格式化、正则测试、编码转换、时间戳、cURL 转代码、二维码、UUID、哈希、JWT 调试等 15 个实用工具。
           </p>
         </div>
         <div class="hero-note">
@@ -41,6 +40,14 @@
         <a class="tool-tab" href="#text-differ" data-view-link="text-differ">文本比对</a>
         <a class="tool-tab" href="#token-calculator" data-view-link="token-calculator">Token 计算</a>
         <a class="tool-tab" href="#json-formatter" data-view-link="json-formatter">JSON 格式化</a>
+        <a class="tool-tab" href="#regex-tester" data-view-link="regex-tester">正则测试</a>
+        <a class="tool-tab" href="#encoding-converter" data-view-link="encoding-converter">编码转换</a>
+        <a class="tool-tab" href="#timestamp-converter" data-view-link="timestamp-converter">时间戳转换</a>
+        <a class="tool-tab" href="#curl-converter" data-view-link="curl-converter">cURL 转代码</a>
+        <a class="tool-tab" href="#qr-generator" data-view-link="qr-generator">二维码生成</a>
+        <a class="tool-tab" href="#uuid-generator" data-view-link="uuid-generator">UUID 生成</a>
+        <a class="tool-tab" href="#hash-generator" data-view-link="hash-generator">哈希生成</a>
+        <a class="tool-tab" href="#jwt-debugger" data-view-link="jwt-debugger">JWT 调试</a>
       </nav>
 
       <main id="homeView" class="layout tool-view">
@@ -87,6 +94,46 @@
               <span class="tool-card-kicker">JSON Formatter</span>
               <strong>JSON 格式化器</strong>
               <p>格式化、压缩和校验 JSON 数据，语法高亮、树形折叠浏览和结构分析。</p>
+            </a>
+            <a class="tool-card" href="#regex-tester" data-view-link="regex-tester">
+              <span class="tool-card-kicker">Regex Tester</span>
+              <strong>正则测试器</strong>
+              <p>编写和测试正则表达式，实时高亮匹配结果，查看捕获组详情。</p>
+            </a>
+            <a class="tool-card" href="#encoding-converter" data-view-link="encoding-converter">
+              <span class="tool-card-kicker">Encoding Converter</span>
+              <strong>编码转换器</strong>
+              <p>Base64、URL 编解码、HTML 实体、Unicode 转义 — 一键互转。</p>
+            </a>
+            <a class="tool-card" href="#timestamp-converter" data-view-link="timestamp-converter">
+              <span class="tool-card-kicker">Timestamp Converter</span>
+              <strong>时间戳转换器</strong>
+              <p>Unix 时间戳与可读时间互转，实时时钟显示，支持多时区换算。</p>
+            </a>
+            <a class="tool-card" href="#curl-converter" data-view-link="curl-converter">
+              <span class="tool-card-kicker">cURL Converter</span>
+              <strong>cURL 转代码</strong>
+              <p>粘贴 cURL 命令，一键生成 fetch、Python requests、Go net/http 代码。</p>
+            </a>
+            <a class="tool-card" href="#qr-generator" data-view-link="qr-generator">
+              <span class="tool-card-kicker">QR Generator</span>
+              <strong>二维码生成器</strong>
+              <p>输入文本或 URL 即时生成二维码，支持下载 PNG 图片。</p>
+            </a>
+            <a class="tool-card" href="#uuid-generator" data-view-link="uuid-generator">
+              <span class="tool-card-kicker">UUID Generator</span>
+              <strong>UUID 生成器</strong>
+              <p>生成 RFC 9562 UUID v4 和 v7，支持批量生成、去连字符、大小写切换。</p>
+            </a>
+            <a class="tool-card" href="#hash-generator" data-view-link="hash-generator">
+              <span class="tool-card-kicker">Hash Generator</span>
+              <strong>哈希生成器</strong>
+              <p>在线计算 MD5、SHA-1、SHA-256、SHA-512 哈希值，纯浏览器端处理。</p>
+            </a>
+            <a class="tool-card" href="#jwt-debugger" data-view-link="jwt-debugger">
+              <span class="tool-card-kicker">JWT Debugger</span>
+              <strong>JWT 调试器</strong>
+              <p>解码 JWT Token，查看 Header 和 Payload，支持 HMAC 签名验证。</p>
             </a>
           </div>
         </section>
@@ -590,6 +637,347 @@
           <div id="jsonFormatterStats"></div>
           <div id="jsonFormatterOutput" class="json-output"></div>
           <div id="jsonFormatterToast" class="toast hidden"></div>
+        </section>
+      </main>
+
+      <main id="regexTesterView" class="layout tool-view hidden">
+        <section class="panel tool-title-panel">
+          <div class="section-head compact">
+            <div>
+              <p class="section-tag">Regex Tester</p>
+              <h2>正则测试器</h2>
+            </div>
+            <a class="ghost-link" href="#home" data-view-link="home">返回工具首页</a>
+          </div>
+          <p class="tip">输入正则表达式和测试文本，实时匹配高亮，捕获组一目了然。</p>
+        </section>
+        <section class="panel regex-input-panel">
+          <div class="regex-controls">
+            <div class="regex-pattern-group">
+              <span class="regex-slash">/</span>
+              <input
+                id="regexPatternInput"
+                class="regex-pattern"
+                type="text"
+                placeholder="输入正则表达式"
+              />
+              <span class="regex-slash">/</span>
+              <input
+                id="regexFlagsInput"
+                class="regex-flags"
+                type="text"
+                maxlength="6"
+                placeholder="g"
+                value="g"
+              />
+            </div>
+          </div>
+          <textarea
+            id="regexTestTextInput"
+            class="regex-test-text"
+            rows="8"
+            placeholder="在此粘贴要匹配的文本..."
+          ></textarea>
+        </section>
+        <section class="panel regex-output-panel">
+          <div id="regexStatsContainer"></div>
+          <div id="regexHighlightContainer" class="regex-highlight"></div>
+          <div id="regexMatchesContainer" class="regex-matches"></div>
+        </section>
+      </main>
+
+      <main id="encodingConverterView" class="layout tool-view hidden">
+        <section class="panel tool-title-panel">
+          <div class="section-head compact">
+            <div>
+              <p class="section-tag">Encoding Converter</p>
+              <h2>编码转换器</h2>
+            </div>
+            <a class="ghost-link" href="#home" data-view-link="home">返回工具首页</a>
+          </div>
+          <p class="tip">输入文本，选择编码方式一键转换，支持 Base64、URL、HTML 实体和 Unicode 转义。</p>
+        </section>
+
+        <section class="panel enc-main-panel">
+          <div class="enc-toolbar">
+            <div class="enc-btn-grid">
+              <button id="enc-base64-encode" class="ghost-btn">Base64 编码</button>
+              <button id="enc-base64-decode" class="ghost-btn">Base64 解码</button>
+              <button id="enc-url-encode" class="ghost-btn">URL 编码</button>
+              <button id="enc-url-decode" class="ghost-btn">URL 解码</button>
+              <button id="enc-html-encode" class="ghost-btn">HTML 编码</button>
+              <button id="enc-html-decode" class="ghost-btn">HTML 解码</button>
+              <button id="enc-unicode-escape" class="ghost-btn">Unicode 转义</button>
+              <button id="enc-unicode-unescape" class="ghost-btn">Unicode 还原</button>
+            </div>
+          </div>
+
+          <div class="enc-io-grid">
+            <div class="enc-io-side">
+              <label class="enc-io-label">输入</label>
+              <textarea id="encInputText" rows="10" placeholder="输入要转换的文本..."></textarea>
+            </div>
+            <div class="enc-io-side">
+              <label class="enc-io-label">输出</label>
+              <textarea id="encOutputText" rows="10" placeholder="转换结果..." readonly></textarea>
+              <div id="encErrorContainer" class="regex-error hidden"></div>
+            </div>
+          </div>
+
+          <div class="action-bar">
+            <button id="encCopyBtn" class="primary-btn">复制结果</button>
+            <button id="encSwapBtn" class="ghost-btn">⇄ 交换</button>
+            <button id="encClearBtn" class="ghost-btn">清空</button>
+          </div>
+          <div id="encToast" class="toast hidden"></div>
+        </section>
+      </main>
+
+      <main id="timestampConverterView" class="layout tool-view hidden">
+        <section class="panel tool-title-panel">
+          <div class="section-head compact">
+            <div>
+              <p class="section-tag">Timestamp Converter</p>
+              <h2>时间戳转换器</h2>
+            </div>
+            <a class="ghost-link" href="#home" data-view-link="home">返回工具首页</a>
+          </div>
+          <p class="tip">Unix 时间戳 ↔ 可读时间互转，实时时钟，支持 8 个常用时区。</p>
+        </section>
+        <section class="panel ts-current-panel">
+          <div id="tsCurrentContainer"></div>
+        </section>
+        <section class="panel ts-convert-panel">
+          <div class="ts-convert-grid">
+            <div class="ts-side">
+              <h3>时间戳 → 日期</h3>
+              <div class="ts-input-row">
+                <input id="tsInput" type="text" placeholder="输入 Unix 时间戳..." />
+                <select id="tsTzSelect"></select>
+                <button id="tsConvertBtn" class="primary-btn">转换</button>
+                <button id="tsNowSecBtn" class="ghost-btn">当前(秒)</button>
+                <button id="tsNowMsBtn" class="ghost-btn">当前(毫秒)</button>
+              </div>
+              <div id="tsResultContainer"></div>
+            </div>
+            <div class="ts-side">
+              <h3>日期 → 时间戳</h3>
+              <div class="ts-input-row">
+                <input id="tsDateInput" type="datetime-local" />
+                <select id="tsTzSelectDate"></select>
+                <button id="tsDateConvertBtn" class="primary-btn">转换</button>
+                <button id="tsNowDateBtn" class="ghost-btn">现在</button>
+              </div>
+              <div id="tsDateResultContainer"></div>
+            </div>
+          </div>
+          <div id="tsToast" class="toast hidden"></div>
+        </section>
+      </main>
+
+      <main id="curlConverterView" class="layout tool-view hidden">
+        <section class="panel tool-title-panel">
+          <div class="section-head compact">
+            <div>
+              <p class="section-tag">cURL Converter</p>
+              <h2>cURL 转代码</h2>
+            </div>
+            <a class="ghost-link" href="#home" data-view-link="home">返回工具首页</a>
+          </div>
+          <p class="tip">粘贴 cURL 命令，自动解析并生成 fetch / Python / Go 等效代码。</p>
+        </section>
+
+        <section class="panel curl-main-panel">
+          <div class="curl-input-row">
+            <textarea id="curlCommandInput" class="curl-input" rows="4" placeholder="粘贴 cURL 命令，例如：&#10;curl -X POST &quot;https://api.example.com/users&quot; -H &quot;Content-Type: application/json&quot; -d '{&quot;name&quot;:&quot;Alice&quot;}'"></textarea>
+            <div class="curl-actions">
+              <button id="curlConvertBtn" class="primary-btn">解析生成</button>
+              <button id="curlExampleBtn" class="ghost-btn">示例</button>
+              <span class="curl-hint">Ctrl+Enter 快捷解析</span>
+            </div>
+          </div>
+          <div id="curlSummaryContainer" class="curl-summary-wrap"></div>
+          <div id="curlErrorContainer" class="regex-error hidden"></div>
+        </section>
+
+        <section class="panel curl-output-panel">
+          <h3>生成的代码</h3>
+          <div class="curl-code-grid">
+            <div class="curl-code-card">
+              <div class="curl-code-header">
+                <span class="curl-code-lang">JavaScript (fetch)</span>
+                <button id="curlCopyFetchBtn" class="ghost-btn-sm">复制</button>
+              </div>
+              <pre id="curlFetchOutput" class="curl-code-pre"></pre>
+            </div>
+            <div class="curl-code-card">
+              <div class="curl-code-header">
+                <span class="curl-code-lang">Python (requests)</span>
+                <button id="curlCopyPythonBtn" class="ghost-btn-sm">复制</button>
+              </div>
+              <pre id="curlPythonOutput" class="curl-code-pre"></pre>
+            </div>
+            <div class="curl-code-card">
+              <div class="curl-code-header">
+                <span class="curl-code-lang">Go (net/http)</span>
+                <button id="curlCopyGoBtn" class="ghost-btn-sm">复制</button>
+              </div>
+              <pre id="curlGoOutput" class="curl-code-pre"></pre>
+            </div>
+          </div>
+          <div id="curlToast" class="toast hidden"></div>
+        </section>
+      </main>
+
+      <main id="qrGeneratorView" class="layout tool-view hidden">
+        <section class="panel tool-title-panel">
+          <div class="section-head compact">
+            <div>
+              <p class="section-tag">QR Generator</p>
+              <h2>二维码生成器</h2>
+            </div>
+            <a class="ghost-link" href="#home" data-view-link="home">返回工具首页</a>
+          </div>
+          <p class="tip">输入文本、URL 或任意内容，即时生成二维码，可下载 PNG 图片。</p>
+        </section>
+
+        <section class="panel qr-main-panel">
+          <div class="qr-body">
+            <div class="qr-left">
+              <textarea id="qrTextInput" class="qr-input" rows="4" placeholder="输入文本或 URL..."></textarea>
+              <div id="qrErrorContainer" class="regex-error hidden"></div>
+            </div>
+            <div class="qr-right">
+              <div class="qr-canvas-wrap">
+                <canvas id="qrCanvas" class="qr-canvas"></canvas>
+                <div class="qr-placeholder">输入内容后显示二维码</div>
+              </div>
+              <div class="qr-info">
+                <span id="qrVersionInfo"></span>
+                <span id="qrSizeInfo"></span>
+              </div>
+              <button id="qrDownloadBtn" class="primary-btn">下载 PNG</button>
+            </div>
+          </div>
+        </section>
+      </main>
+
+      <!-- UUID 生成器 -->
+      <main id="uuidGeneratorView" class="layout tool-view hidden">
+        <section class="panel tool-title-panel">
+          <div class="section-head compact">
+            <div>
+              <p class="section-tag">UUID Generator</p>
+              <h2>UUID 生成器</h2>
+            </div>
+            <a class="ghost-link" href="#home" data-view-link="home">返回工具首页</a>
+          </div>
+          <p class="tip">在线生成 UUID v4（随机）和 v7（时间排序），支持批量生成和格式自定义。</p>
+        </section>
+        <section class="panel">
+          <div class="uuid-toolbar">
+            <div class="uuid-controls">
+              <label class="field">
+                <span>版本</span>
+                <select id="uuidVersionSelect">
+                  <option value="v4">v4 随机</option>
+                  <option value="v7">v7 时间排序</option>
+                </select>
+              </label>
+              <label class="field">
+                <span>数量</span>
+                <input id="uuidCountInput" type="number" value="1" min="1" max="100" />
+              </label>
+              <label class="field uuid-check-field">
+                <input id="uuidNoHyphens" type="checkbox" />
+                <span>去连字符</span>
+              </label>
+              <label class="field uuid-check-field">
+                <input id="uuidUppercase" type="checkbox" />
+                <span>大写</span>
+              </label>
+            </div>
+            <div class="uuid-actions">
+              <button id="uuidGenerateBtn" class="primary-btn">生成</button>
+              <button id="uuidCopyAllBtn" class="ghost-btn">复制全部</button>
+            </div>
+          </div>
+          <div id="uuidList" class="uuid-list"></div>
+        </section>
+      </main>
+
+      <!-- 哈希生成器 -->
+      <main id="hashGeneratorView" class="layout tool-view hidden">
+        <section class="panel tool-title-panel">
+          <div class="section-head compact">
+            <div>
+              <p class="section-tag">Hash Generator</p>
+              <h2>哈希生成器</h2>
+            </div>
+            <a class="ghost-link" href="#home" data-view-link="home">返回工具首页</a>
+          </div>
+          <p class="tip">输入文本，选择算法，实时生成哈希值。数据仅在浏览器本地处理。</p>
+        </section>
+        <section class="panel">
+          <label class="field">
+            <span>输入文本</span>
+            <textarea id="hashInput" rows="6" placeholder="输入要计算哈希的文本..."></textarea>
+          </label>
+          <label class="field">
+            <span>算法</span>
+            <select id="hashAlgoSelect">
+              <option value="MD5">MD5</option>
+              <option value="SHA-1">SHA-1</option>
+              <option value="SHA-256" selected>SHA-256</option>
+              <option value="SHA-512">SHA-512</option>
+            </select>
+          </label>
+          <div id="hashResult" class="hash-result"></div>
+        </section>
+      </main>
+
+      <!-- JWT 调试器 -->
+      <main id="jwtDebuggerView" class="layout tool-view hidden">
+        <section class="panel tool-title-panel">
+          <div class="section-head compact">
+            <div>
+              <p class="section-tag">JWT Debugger</p>
+              <h2>JWT 调试器</h2>
+            </div>
+            <a class="ghost-link" href="#home" data-view-link="home">返回工具首页</a>
+          </div>
+          <p class="tip">粘贴 JWT Token，自动解码 Header 和 Payload，支持 HMAC 签名验证。</p>
+        </section>
+        <section class="panel">
+          <label class="field">
+            <span>JWT Token</span>
+            <textarea id="jwtTokenInput" rows="4" placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c"></textarea>
+          </label>
+          <div class="jwt-output-grid">
+            <div class="jwt-panel">
+              <div class="jwt-panel-head">
+                <span>Header</span>
+                <button id="jwtCopyHeaderBtn" class="ghost-btn tiny">复制</button>
+              </div>
+              <div id="jwtHeaderOutput" class="jwt-code">等待解析</div>
+            </div>
+            <div class="jwt-panel">
+              <div class="jwt-panel-head">
+                <span>Payload</span>
+                <button id="jwtCopyPayloadBtn" class="ghost-btn tiny">复制</button>
+              </div>
+              <div id="jwtPayloadOutput" class="jwt-code"></div>
+            </div>
+          </div>
+          <div class="jwt-sig-row">
+            <span>签名</span>
+            <div id="jwtSigOutput"></div>
+          </div>
+          <div class="jwt-verify-row">
+            <input id="jwtSecretInput" class="jwt-secret-input" type="text" placeholder="HMAC 密钥（可选）" />
+            <button id="jwtVerifyBtn" class="primary-btn">验证签名</button>
+            <div id="jwtVerifyOutput"></div>
+          </div>
         </section>
       </main>
 
