@@ -105,3 +105,28 @@ export const textDiffer = {
   statsContainer: document.querySelector("#differStatsContainer"),
   diffOutput: document.querySelector("#differDiffOutput"),
 };
+
+// Token 计算器
+export const tokenCalc = {
+  view: document.querySelector("#tokenCalculatorView"),
+  textInput: document.querySelector("#tokenCalcTextInput"),
+  modelSelect: document.querySelector("#tokenCalcModelSelect"),
+  clearBtn: document.querySelector("#tokenCalcClearBtn"),
+  statsContainer: document.querySelector("#tokenCalcStatsContainer"),
+  detailsContainer: document.querySelector("#tokenCalcDetailsContainer"),
+};
+
+// JSON 格式化器
+export const jsonFormatter = {
+  view: document.querySelector("#jsonFormatterView"),
+  textInput: document.querySelector("#jsonFormatterInput"),
+  formatBtn: document.querySelector("#jsonFormatBtn"),
+  compressBtn: document.querySelector("#jsonCompressBtn"),
+  validateBtn: document.querySelector("#jsonValidateBtn"),
+  copyBtn: document.querySelector("#jsonCopyBtn"),
+  copyIndentBtn: document.querySelector("#jsonCopyIndentBtn"),
+  clearBtn: document.querySelector("#jsonClearBtn"),
+  statsContainer: document.querySelector("#jsonFormatterStats"),
+  outputContainer: document.querySelector("#jsonFormatterOutput"),
+  toast: document.querySelector("#jsonFormatterToast"),
+};

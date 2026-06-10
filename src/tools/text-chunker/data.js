@@ -13,7 +13,7 @@ export const DEFAULTS = {
 // 粗略 token 估算：中文约 1 字 ≈ 1.5 tokens，英文约 1 词 ≈ 1.3 tokens
 export function estimateTokens(text) {
   const chineseChars = (text.match(/[\u4e00-\u9fff]/g) || []).length;
-  const englishWords = (text.match(/[a-zA-Z]+/g) || []).length;
+  const englishWords = (text.match(/[a-zA-Z]+(?:'[a-zA-Z]+)?/g) || []).length;
   const others = text.length - chineseChars - englishWords;
   return Math.max(1, Math.round(chineseChars * 1.5 + englishWords * 1.3 + others * 0.5));
 }
@@ -67,12 +67,14 @@ export function chunkText(text, mode, size, overlap) {
 }
 
 function chunkByChar(text, size, overlap) {
+  // 防止 overlap >= size 导致死循环
+  const step = Math.max(1, size - overlap);
   const chunks = [];
   let start = 0;
   while (start < text.length) {
     const end = Math.min(start + size, text.length);
     chunks.push(text.slice(start, end));
-    start += size - overlap;
+    start += step;
     if (end >= text.length) break;
   }
   return chunks;

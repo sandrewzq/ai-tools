@@ -31,6 +31,8 @@ function showView(view, toolsMap) {
     "prompt-templates": "promptTemplatesView",
     "text-chunker": "textChunkerView",
     "text-differ": "textDifferView",
+    "token-calculator": "tokenCalculatorView",
+    "json-formatter": "jsonFormatterView",
   };
   const targetEl = document.getElementById(viewMap[normalizedView]);
   if (targetEl) targetEl.classList.remove("hidden");

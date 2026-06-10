@@ -10,7 +10,7 @@
       href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=Noto+Sans+SC:wght@400;500;700&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="./styles.css" />
+    <link rel="stylesheet" href="./styles.css?v=7" />
   </head>
   <body>
     <div class="page-shell">
@@ -19,7 +19,7 @@
           <p class="eyebrow">AI Toolkit</p>
           <h1>AI 工具箱</h1>
           <p class="hero-text">
-            一个可直接发布到 GitHub Pages 的静态工具集合，包含大模型测速、配色推荐、提示词模板、文本分块、文本比对等实用工具。
+            一个可直接发布到 GitHub Pages 的静态工具集合，包含大模型测速、配色生成器、提示词模板、文本分块、文本比对等实用工具。
           </p>
         </div>
         <div class="hero-note">
@@ -35,10 +35,12 @@
       <nav class="tool-tabs" aria-label="工具导航">
         <a class="tool-tab tool-tab-home" href="#home" data-view-link="home">工具首页</a>
         <a class="tool-tab" href="#speed-test" data-view-link="speed-test">大模型测速</a>
-        <a class="tool-tab" href="#color-palette" data-view-link="color-palette">AI 配色推荐</a>
+        <a class="tool-tab" href="#color-palette" data-view-link="color-palette">配色生成器</a>
         <a class="tool-tab" href="#prompt-templates" data-view-link="prompt-templates">提示词模板</a>
         <a class="tool-tab" href="#text-chunker" data-view-link="text-chunker">文本分块</a>
         <a class="tool-tab" href="#text-differ" data-view-link="text-differ">文本比对</a>
+        <a class="tool-tab" href="#token-calculator" data-view-link="token-calculator">Token 计算</a>
+        <a class="tool-tab" href="#json-formatter" data-view-link="json-formatter">JSON 格式化</a>
       </nav>
 
       <main id="homeView" class="layout tool-view">
@@ -58,7 +60,7 @@
             </a>
             <a class="tool-card" href="#color-palette" data-view-link="color-palette">
               <span class="tool-card-kicker">Palette Generator</span>
-              <strong>AI 配色推荐</strong>
+              <strong>配色生成器</strong>
               <p>根据场景、风格和主色生成网页可用色板、CSS 变量和界面预览。</p>
             </a>
             <a class="tool-card" href="#prompt-templates" data-view-link="prompt-templates">
@@ -76,6 +78,16 @@
               <strong>文本比对器</strong>
               <p>对比两段文本差异，高亮新增/删除/未变行，适合比较 AI 回复或文档版本。</p>
             </a>
+            <a class="tool-card" href="#token-calculator" data-view-link="token-calculator">
+              <span class="tool-card-kicker">Token Estimator</span>
+              <strong>Token 计算器</strong>
+              <p>估算文本在 GPT / Claude 模型下的 token 消耗，实时统计中英文字数和预估费用。</p>
+            </a>
+            <a class="tool-card" href="#json-formatter" data-view-link="json-formatter">
+              <span class="tool-card-kicker">JSON Formatter</span>
+              <strong>JSON 格式化器</strong>
+              <p>格式化、压缩和校验 JSON 数据，语法高亮、树形折叠浏览和结构分析。</p>
+            </a>
           </div>
         </section>
       </main>
@@ -85,7 +97,7 @@
           <div class="section-head compact">
             <div>
               <p class="section-tag">Palette Generator</p>
-              <h2>AI 配色推荐</h2>
+              <h2>配色生成器</h2>
             </div>
             <a class="ghost-link" href="#home" data-view-link="home">返回工具首页</a>
           </div>
@@ -523,6 +535,64 @@
           <pre id="logOutput" class="log-output">等待开始…</pre>
         </section>
       </main>
+
+      <main id="tokenCalculatorView" class="layout tool-view hidden">
+        <section class="panel tool-title-panel">
+          <div class="section-head compact">
+            <div>
+              <p class="section-tag">Token Estimator</p>
+              <h2>Token 计算器</h2>
+            </div>
+            <a class="ghost-link" href="#home" data-view-link="home">返回工具首页</a>
+          </div>
+          <p class="tip">输入文本后将自动估算 token 消耗，支持 GPT-4o / Claude 等主流模型。</p>
+        </section>
+
+        <section class="panel token-calc-panel">
+          <textarea id="tokenCalcTextInput" rows="10" placeholder="在此粘贴或输入文本，将自动估算 token 消耗..."></textarea>
+          <div class="action-bar">
+            <select id="tokenCalcModelSelect" class="field-select"></select>
+            <button id="tokenCalcClearBtn" class="ghost-btn" type="button">清空</button>
+          </div>
+        </section>
+
+        <section class="panel token-calc-output-panel">
+          <div id="tokenCalcStatsContainer"></div>
+          <div id="tokenCalcDetailsContainer"></div>
+        </section>
+      </main>
+
+      <main id="jsonFormatterView" class="layout tool-view hidden">
+        <section class="panel tool-title-panel">
+          <div class="section-head compact">
+            <div>
+              <p class="section-tag">JSON Formatter</p>
+              <h2>JSON 格式化器</h2>
+            </div>
+            <a class="ghost-link" href="#home" data-view-link="home">返回工具首页</a>
+          </div>
+          <p class="tip">粘贴 JSON 文本，支持格式化、压缩、校验，语法高亮和树形折叠浏览。</p>
+        </section>
+
+        <section class="panel json-formatter-input-panel">
+          <textarea id="jsonFormatterInput" rows="10" placeholder='粘贴 JSON 文本，例如：{"name":"Alice","age":30}'></textarea>
+          <div class="action-bar">
+            <button id="jsonFormatBtn" class="primary-btn" type="button">格式化</button>
+            <button id="jsonCompressBtn" class="ghost-btn" type="button">压缩</button>
+            <button id="jsonValidateBtn" class="ghost-btn" type="button">校验</button>
+            <button id="jsonCopyBtn" class="ghost-btn" type="button" disabled>复制</button>
+            <button id="jsonCopyIndentBtn" class="primary-btn" type="button" disabled>复制（含缩进）</button>
+            <button id="jsonClearBtn" class="ghost-btn" type="button">清空</button>
+          </div>
+        </section>
+
+        <section class="panel json-formatter-output-panel">
+          <div id="jsonFormatterStats"></div>
+          <div id="jsonFormatterOutput" class="json-output"></div>
+          <div id="jsonFormatterToast" class="toast hidden"></div>
+        </section>
+      </main>
+
     </div>
 
     <template id="targetTemplate">

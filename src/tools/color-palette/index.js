@@ -7,7 +7,7 @@ import * as render from "./render.js";
 export const meta = {
   id: "color-palette",
   route: "#color-palette",
-  title: "AI 配色推荐",
+  title: "配色生成器",
   kicker: "Palette Generator",
   description: "根据场景、风格和主色生成网页可用色板、CSS 变量和界面预览。",
 };
