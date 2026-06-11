@@ -20,6 +20,12 @@ const toolImporters = {
   "uuid-generator": () => import("../tools/uuid-generator/index.js"),
   "hash-generator": () => import("../tools/hash-generator/index.js"),
   "jwt-debugger": () => import("../tools/jwt-debugger/index.js"),
+  "cron-parser": () => import("../tools/cron-parser/index.js"),
+  "color-converter": () => import("../tools/color-converter/index.js"),
+  "yaml-formatter": () => import("../tools/yaml-formatter/index.js"),
+  "xml-formatter": () => import("../tools/xml-formatter/index.js"),
+  "url-parser": () => import("../tools/url-parser/index.js"),
+  "csv-converter": () => import("../tools/csv-converter/index.js"),
 };
 
 // 已加载的工具模块缓存
@@ -45,6 +51,12 @@ const viewMap = {
   "uuid-generator": "uuidGeneratorView",
   "hash-generator": "hashGeneratorView",
   "jwt-debugger": "jwtDebuggerView",
+  "cron-parser": "cronParserView",
+  "color-converter": "colorConverterView",
+  "yaml-formatter": "yamlFormatterView",
+  "xml-formatter": "xmlFormatterView",
+  "url-parser": "urlParserView",
+  "csv-converter": "csvConverterView",
 };
 
 export function initRouter() {

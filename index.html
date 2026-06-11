@@ -9,7 +9,7 @@
     <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=Noto+Sans+SC:wght@400;500;700&display=swap" />
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=Noto+Sans+SC:wght@400;500;700&display=swap" media="print" onload="this.onload=null;this.media='all'" />
     <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=Noto+Sans+SC:wght@400;500;700&display=swap" /></noscript>
-    <link rel="stylesheet" href="./styles.css?v=14" />
+    <link rel="stylesheet" href="./styles.css?v=15" />
   </head>
   <body>
     <div class="page-shell">
@@ -18,7 +18,7 @@
           <p class="eyebrow">AI Toolkit</p>
           <h1>AI 工具箱</h1>
           <p class="hero-text">
-            一个可直接发布到 GitHub Pages 的静态工具集合，包含大模型测速、配色生成、提示词模板、文本分块、文本比对、Token 计算、JSON 格式化、正则测试、编码转换、时间戳、cURL 转代码、二维码、UUID、哈希、JWT 调试等 15 个实用工具。
+            一个可直接发布到 GitHub Pages 的静态工具集合，包含大模型测速、配色生成、提示词模板、文本分块、文本比对、Token 计算、JSON 格式化、正则测试、编码转换、时间戳、cURL 转代码、二维码、UUID、哈希、JWT 调试、Cron 解析、颜色转换、YAML、XML、URL、CSV 等 21 个实用工具。
           </p>
         </div>
         <div class="hero-note">
@@ -48,6 +48,12 @@
         <a class="tool-tab" href="#uuid-generator" data-view-link="uuid-generator">UUID 生成</a>
         <a class="tool-tab" href="#hash-generator" data-view-link="hash-generator">哈希生成</a>
         <a class="tool-tab" href="#jwt-debugger" data-view-link="jwt-debugger">JWT 调试</a>
+        <a class="tool-tab" href="#cron-parser" data-view-link="cron-parser">Cron 解析</a>
+        <a class="tool-tab" href="#color-converter" data-view-link="color-converter">颜色转换</a>
+        <a class="tool-tab" href="#yaml-formatter" data-view-link="yaml-formatter">YAML 格式化</a>
+        <a class="tool-tab" href="#xml-formatter" data-view-link="xml-formatter">XML 格式化</a>
+        <a class="tool-tab" href="#url-parser" data-view-link="url-parser">URL 解析</a>
+        <a class="tool-tab" href="#csv-converter" data-view-link="csv-converter">CSV 转换</a>
       </nav>
 
       <main id="homeView" class="layout tool-view">
@@ -134,6 +140,36 @@
               <span class="tool-card-kicker">JWT Debugger</span>
               <strong>JWT 调试器</strong>
               <p>解码 JWT Token，查看 Header 和 Payload，支持 HMAC 签名验证。</p>
+            </a>
+            <a class="tool-card" href="#cron-parser" data-view-link="cron-parser">
+              <span class="tool-card-kicker">Cron Parser</span>
+              <strong>Cron 解析器</strong>
+              <p>解析 5 段 Cron 表达式，输出字段拆解和中文自然语言说明。</p>
+            </a>
+            <a class="tool-card" href="#color-converter" data-view-link="color-converter">
+              <span class="tool-card-kicker">Color Converter</span>
+              <strong>颜色格式转换</strong>
+              <p>将 HEX、RGB、HSL 颜色互转，并展示实时预览与复制结果。</p>
+            </a>
+            <a class="tool-card" href="#yaml-formatter" data-view-link="yaml-formatter">
+              <span class="tool-card-kicker">YAML Formatter</span>
+              <strong>YAML 格式化器</strong>
+              <p>格式化、压缩和校验 YAML，支持 YAML 与 JSON 基础互转。</p>
+            </a>
+            <a class="tool-card" href="#xml-formatter" data-view-link="xml-formatter">
+              <span class="tool-card-kicker">XML Formatter</span>
+              <strong>XML 格式化器</strong>
+              <p>格式化、压缩和校验 XML，支持 XML 树结构 JSON 预览。</p>
+            </a>
+            <a class="tool-card" href="#url-parser" data-view-link="url-parser">
+              <span class="tool-card-kicker">URL Parser</span>
+              <strong>URL 解析器</strong>
+              <p>拆解 URL 组成部分，查看 Query 表格、Query JSON 和重建结果。</p>
+            </a>
+            <a class="tool-card" href="#csv-converter" data-view-link="csv-converter">
+              <span class="tool-card-kicker">CSV Converter</span>
+              <strong>CSV 转 JSON / 表格</strong>
+              <p>解析 CSV 为 JSON，并提供表格预览、分隔符识别和表头选项。</p>
             </a>
           </div>
         </section>
@@ -859,6 +895,246 @@
               <button id="qrDownloadBtn" class="primary-btn">下载 PNG</button>
             </div>
           </div>
+        </section>
+      </main>
+
+      <main id="cronParserView" class="layout tool-view hidden">
+        <section class="panel tool-title-panel">
+          <div class="section-head compact">
+            <div>
+              <p class="section-tag">Cron Parser</p>
+              <h2>Cron 解析器</h2>
+            </div>
+            <a class="ghost-link" href="#home" data-view-link="home">返回工具首页</a>
+          </div>
+          <p class="tip">输入 5 段 Cron 表达式，自动拆解字段含义并输出中文自然语言说明。</p>
+        </section>
+        <section class="panel cron-main-panel">
+          <label class="field">
+            <span>Cron 表达式</span>
+            <div class="cron-toolbar">
+              <input id="cronInput" type="text" placeholder="例如：0 9 * * 1-5" />
+              <button id="cronParseBtn" class="primary-btn">解析表达式</button>
+            </div>
+          </label>
+          <div id="cronExamples" class="cron-examples"></div>
+          <div id="cronError" class="regex-error hidden"></div>
+          <div id="cronSummary" class="cron-summary-wrap"></div>
+          <div id="cronFields" class="cron-fields-wrap"></div>
+        </section>
+      </main>
+
+      <main id="colorConverterView" class="layout tool-view hidden">
+        <section class="panel tool-title-panel">
+          <div class="section-head compact">
+            <div>
+              <p class="section-tag">Color Converter</p>
+              <h2>颜色格式转换</h2>
+            </div>
+            <a class="ghost-link" href="#home" data-view-link="home">返回工具首页</a>
+          </div>
+          <p class="tip">输入 HEX / RGB / HSL 颜色值，自动转换为多种格式并实时预览颜色效果。</p>
+        </section>
+        <section class="panel color-converter-panel">
+          <label class="field">
+            <span>输入颜色</span>
+            <div class="color-converter-toolbar">
+              <input id="colorConverterInput" type="text" placeholder="#0E7C66 / rgb(14, 124, 102) / hsl(168, 80%, 27%)" />
+              <button id="colorConvertBtn" class="primary-btn">转换</button>
+            </div>
+          </label>
+          <div id="colorConverterError" class="regex-error hidden"></div>
+          <div class="color-converter-layout">
+            <div class="color-converter-preview-card">
+              <h3>颜色预览</h3>
+              <div id="colorConverterPreview"></div>
+            </div>
+            <div class="color-converter-formats-card">
+              <h3>格式结果</h3>
+              <div id="colorConverterFormats" class="color-converter-formats"></div>
+            </div>
+          </div>
+        </section>
+      </main>
+
+      <main id="yamlFormatterView" class="layout tool-view hidden">
+        <section class="panel tool-title-panel">
+          <div class="section-head compact">
+            <div>
+              <p class="section-tag">YAML Formatter</p>
+              <h2>YAML 格式化器</h2>
+            </div>
+            <a class="ghost-link" href="#home" data-view-link="home">返回工具首页</a>
+          </div>
+          <p class="tip">格式化、压缩和校验 YAML，支持 YAML 与 JSON 基础互转，适合配置文件快速整理。</p>
+        </section>
+        <section class="panel devtool-main-panel">
+          <label class="field">
+            <span>输入 YAML / JSON</span>
+            <textarea id="yamlFormatterInput" rows="10" placeholder="name: demo&#10;active: true&#10;items:&#10;  - api&#10;  - web"></textarea>
+          </label>
+          <div class="action-bar">
+            <button id="yamlFormatBtn" class="primary-btn" type="button">格式化</button>
+            <button id="yamlCompactBtn" class="ghost-btn" type="button">压缩</button>
+            <button id="yamlToJsonBtn" class="ghost-btn" type="button">YAML → JSON</button>
+            <button id="jsonToYamlBtn" class="ghost-btn" type="button">JSON → YAML</button>
+            <button id="yamlCopyBtn" class="ghost-btn" type="button">复制结果</button>
+            <button id="yamlClearBtn" class="ghost-btn" type="button">清空</button>
+          </div>
+          <div id="yamlFormatterError" class="regex-error hidden"></div>
+          <div id="yamlFormatterStats"></div>
+          <div class="devtool-output-grid">
+            <div class="devtool-output-card">
+              <h3>格式化结果</h3>
+              <pre id="yamlFormatterOutput" class="devtool-code-output"></pre>
+            </div>
+            <div class="devtool-output-card">
+              <h3>JSON 预览</h3>
+              <pre id="yamlJsonOutput" class="devtool-code-output"></pre>
+            </div>
+          </div>
+          <div id="yamlFormatterToast" class="toast hidden"></div>
+        </section>
+      </main>
+
+      <main id="xmlFormatterView" class="layout tool-view hidden">
+        <section class="panel tool-title-panel">
+          <div class="section-head compact">
+            <div>
+              <p class="section-tag">XML Formatter</p>
+              <h2>XML 格式化器</h2>
+            </div>
+            <a class="ghost-link" href="#home" data-view-link="home">返回工具首页</a>
+          </div>
+          <p class="tip">格式化、压缩和校验 XML，输出可读结构和 JSON 树预览。</p>
+        </section>
+        <section class="panel devtool-main-panel">
+          <label class="field">
+            <span>输入 XML</span>
+            <textarea id="xmlFormatterInput" rows="10" placeholder='&lt;root&gt;&lt;item id="1"&gt;A&lt;/item&gt;&lt;/root&gt;'></textarea>
+          </label>
+          <div class="action-bar">
+            <button id="xmlFormatBtn" class="primary-btn" type="button">格式化</button>
+            <button id="xmlCompactBtn" class="ghost-btn" type="button">压缩</button>
+            <button id="xmlToJsonBtn" class="ghost-btn" type="button">XML → JSON</button>
+            <button id="xmlCopyBtn" class="ghost-btn" type="button">复制结果</button>
+            <button id="xmlClearBtn" class="ghost-btn" type="button">清空</button>
+          </div>
+          <div id="xmlFormatterError" class="regex-error hidden"></div>
+          <div id="xmlFormatterStats"></div>
+          <div class="devtool-output-grid">
+            <div class="devtool-output-card">
+              <h3>格式化结果</h3>
+              <pre id="xmlFormatterOutput" class="devtool-code-output"></pre>
+            </div>
+            <div class="devtool-output-card">
+              <h3>XML 树 JSON</h3>
+              <pre id="xmlTreeOutput" class="devtool-code-output"></pre>
+            </div>
+          </div>
+          <div id="xmlFormatterToast" class="toast hidden"></div>
+        </section>
+      </main>
+
+      <main id="urlParserView" class="layout tool-view hidden">
+        <section class="panel tool-title-panel">
+          <div class="section-head compact">
+            <div>
+              <p class="section-tag">URL Parser</p>
+              <h2>URL 解析器</h2>
+            </div>
+            <a class="ghost-link" href="#home" data-view-link="home">返回工具首页</a>
+          </div>
+          <p class="tip">拆解 URL 协议、域名、端口、路径、Hash 和 Query 参数，支持复制 Query JSON。</p>
+        </section>
+        <section class="panel devtool-main-panel">
+          <label class="field">
+            <span>输入 URL</span>
+            <div class="devtool-inline-toolbar">
+              <input id="urlParserInput" type="text" placeholder="https://api.example.com/v1/chat?model=gpt-4o&stream=true#result" />
+              <button id="urlParseBtn" class="primary-btn" type="button">解析</button>
+            </div>
+          </label>
+          <div class="action-bar">
+            <button id="urlExampleBtn" class="ghost-btn" type="button">填入示例</button>
+            <button id="urlCopyUrlBtn" class="ghost-btn" type="button">复制完整 URL</button>
+            <button id="urlCopyJsonBtn" class="ghost-btn" type="button">复制 Query JSON</button>
+            <button id="urlClearBtn" class="ghost-btn" type="button">清空</button>
+          </div>
+          <div id="urlParserError" class="regex-error hidden"></div>
+          <div class="devtool-output-grid">
+            <div class="devtool-output-card">
+              <h3>URL 组成</h3>
+              <div id="urlPartsOutput" class="url-parts-output"></div>
+            </div>
+            <div class="devtool-output-card">
+              <h3>Query JSON</h3>
+              <pre id="urlQueryJsonOutput" class="devtool-code-output"></pre>
+            </div>
+          </div>
+          <div class="devtool-output-card devtool-wide-card">
+            <h3>Query 表格</h3>
+            <div id="urlQueryOutput" class="devtool-table-wrap"></div>
+          </div>
+          <div class="devtool-output-card devtool-wide-card">
+            <h3>重建 URL</h3>
+            <pre id="urlRebuiltOutput" class="devtool-code-output compact"></pre>
+          </div>
+          <div id="urlParserToast" class="toast hidden"></div>
+        </section>
+      </main>
+
+      <main id="csvConverterView" class="layout tool-view hidden">
+        <section class="panel tool-title-panel">
+          <div class="section-head compact">
+            <div>
+              <p class="section-tag">CSV Converter</p>
+              <h2>CSV 转 JSON / 表格</h2>
+            </div>
+            <a class="ghost-link" href="#home" data-view-link="home">返回工具首页</a>
+          </div>
+          <p class="tip">解析 CSV 为 JSON，并提供表格预览、分隔符识别和表头选项。</p>
+        </section>
+        <section class="panel devtool-main-panel">
+          <label class="field">
+            <span>输入 CSV</span>
+            <textarea id="csvConverterInput" rows="10" placeholder='name,role,note&#10;Alice,dev,"hello, world"&#10;Bob,ops,line'></textarea>
+          </label>
+          <div class="devtool-options-row">
+            <label class="field">
+              <span>分隔符</span>
+              <select id="csvDelimiterSelect">
+                <option value="auto">自动识别</option>
+                <option value="comma">逗号 ,</option>
+                <option value="semicolon">分号 ;</option>
+                <option value="tab">Tab</option>
+                <option value="pipe">竖线 |</option>
+              </select>
+            </label>
+            <label class="field devtool-check-field">
+              <input id="csvHasHeaderCheck" type="checkbox" checked />
+              <span>首行作为表头</span>
+            </label>
+          </div>
+          <div class="action-bar">
+            <button id="csvConvertBtn" class="primary-btn" type="button">转换</button>
+            <button id="csvExampleBtn" class="ghost-btn" type="button">填入示例</button>
+            <button id="csvCopyBtn" class="ghost-btn" type="button">复制 JSON</button>
+            <button id="csvClearBtn" class="ghost-btn" type="button">清空</button>
+          </div>
+          <div id="csvConverterError" class="regex-error hidden"></div>
+          <div id="csvConverterStats"></div>
+          <div class="devtool-output-grid">
+            <div class="devtool-output-card">
+              <h3>JSON 输出</h3>
+              <pre id="csvJsonOutput" class="devtool-code-output"></pre>
+            </div>
+            <div class="devtool-output-card">
+              <h3>表格预览</h3>
+              <div id="csvTableOutput" class="devtool-table-wrap"></div>
+            </div>
+          </div>
+          <div id="csvConverterToast" class="toast hidden"></div>
         </section>
       </main>
 

@@ -117,6 +117,90 @@ export const jwtDebugger = lazyNS(() => ({
   secretInput: document.querySelector("#jwtSecretInput"),
 }));
 
+// 颜色格式转换
+export const colorConverter = lazyNS(() => ({
+  view: document.querySelector("#colorConverterView"),
+  input: document.querySelector("#colorConverterInput"),
+  convertBtn: document.querySelector("#colorConvertBtn"),
+  preview: document.querySelector("#colorConverterPreview"),
+  formats: document.querySelector("#colorConverterFormats"),
+  error: document.querySelector("#colorConverterError"),
+}));
+
+// Cron 解析器
+export const cronParser = lazyNS(() => ({
+  view: document.querySelector("#cronParserView"),
+  input: document.querySelector("#cronInput"),
+  parseBtn: document.querySelector("#cronParseBtn"),
+  examples: document.querySelector("#cronExamples"),
+  summary: document.querySelector("#cronSummary"),
+  fields: document.querySelector("#cronFields"),
+  error: document.querySelector("#cronError"),
+}));
+
+export const yamlFormatter = lazyNS(() => ({
+  view: document.querySelector("#yamlFormatterView"),
+  input: document.querySelector("#yamlFormatterInput"),
+  formatBtn: document.querySelector("#yamlFormatBtn"),
+  compactBtn: document.querySelector("#yamlCompactBtn"),
+  toJsonBtn: document.querySelector("#yamlToJsonBtn"),
+  fromJsonBtn: document.querySelector("#jsonToYamlBtn"),
+  copyBtn: document.querySelector("#yamlCopyBtn"),
+  clearBtn: document.querySelector("#yamlClearBtn"),
+  output: document.querySelector("#yamlFormatterOutput"),
+  jsonOutput: document.querySelector("#yamlJsonOutput"),
+  stats: document.querySelector("#yamlFormatterStats"),
+  error: document.querySelector("#yamlFormatterError"),
+  toast: document.querySelector("#yamlFormatterToast"),
+}));
+
+export const xmlFormatter = lazyNS(() => ({
+  view: document.querySelector("#xmlFormatterView"),
+  input: document.querySelector("#xmlFormatterInput"),
+  formatBtn: document.querySelector("#xmlFormatBtn"),
+  compactBtn: document.querySelector("#xmlCompactBtn"),
+  toJsonBtn: document.querySelector("#xmlToJsonBtn"),
+  copyBtn: document.querySelector("#xmlCopyBtn"),
+  clearBtn: document.querySelector("#xmlClearBtn"),
+  output: document.querySelector("#xmlFormatterOutput"),
+  tree: document.querySelector("#xmlTreeOutput"),
+  stats: document.querySelector("#xmlFormatterStats"),
+  error: document.querySelector("#xmlFormatterError"),
+  toast: document.querySelector("#xmlFormatterToast"),
+}));
+
+export const urlParser = lazyNS(() => ({
+  view: document.querySelector("#urlParserView"),
+  input: document.querySelector("#urlParserInput"),
+  parseBtn: document.querySelector("#urlParseBtn"),
+  exampleBtn: document.querySelector("#urlExampleBtn"),
+  copyUrlBtn: document.querySelector("#urlCopyUrlBtn"),
+  copyJsonBtn: document.querySelector("#urlCopyJsonBtn"),
+  clearBtn: document.querySelector("#urlClearBtn"),
+  parts: document.querySelector("#urlPartsOutput"),
+  query: document.querySelector("#urlQueryOutput"),
+  json: document.querySelector("#urlQueryJsonOutput"),
+  rebuilt: document.querySelector("#urlRebuiltOutput"),
+  error: document.querySelector("#urlParserError"),
+  toast: document.querySelector("#urlParserToast"),
+}));
+
+export const csvConverter = lazyNS(() => ({
+  view: document.querySelector("#csvConverterView"),
+  input: document.querySelector("#csvConverterInput"),
+  delimiter: document.querySelector("#csvDelimiterSelect"),
+  hasHeader: document.querySelector("#csvHasHeaderCheck"),
+  convertBtn: document.querySelector("#csvConvertBtn"),
+  exampleBtn: document.querySelector("#csvExampleBtn"),
+  copyBtn: document.querySelector("#csvCopyBtn"),
+  clearBtn: document.querySelector("#csvClearBtn"),
+  json: document.querySelector("#csvJsonOutput"),
+  table: document.querySelector("#csvTableOutput"),
+  stats: document.querySelector("#csvConverterStats"),
+  error: document.querySelector("#csvConverterError"),
+  toast: document.querySelector("#csvConverterToast"),
+}));
+
 // 导航
 export const nav = lazyNS(() => ({
   links: document.querySelectorAll("[data-view-link]"),

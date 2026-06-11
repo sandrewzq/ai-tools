@@ -1705,6 +1705,174 @@ button:disabled {
   }
 }
 
+/* ---- 格式/解析增强工具 ---- */
+
+.devtool-main-panel textarea,
+.devtool-main-panel input,
+.devtool-main-panel select {
+  font-family: var(--font-mono);
+}
+
+.devtool-inline-toolbar {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.devtool-inline-toolbar input {
+  flex: 1 1 360px;
+}
+
+.devtool-options-row {
+  display: flex;
+  gap: 14px;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  margin: 12px 0;
+}
+
+.devtool-options-row .field {
+  min-width: 180px;
+}
+
+.devtool-check-field {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
+  min-height: 42px;
+}
+
+.devtool-check-field input {
+  width: auto;
+}
+
+.devtool-output-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+  margin-top: 14px;
+}
+
+.devtool-output-card {
+  border: 1px solid var(--border-color);
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.72);
+  padding: 16px;
+  min-width: 0;
+}
+
+.devtool-wide-card {
+  margin-top: 16px;
+}
+
+.devtool-output-card h3 {
+  margin: 0 0 12px;
+  font-size: 16px;
+}
+
+.devtool-code-output {
+  min-height: 160px;
+  max-height: 460px;
+  overflow: auto;
+  margin: 0;
+  padding: 14px;
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  background: var(--code-bg);
+  color: var(--text-primary);
+  font-family: var(--font-mono);
+  font-size: 13px;
+  line-height: 1.6;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.devtool-code-output.compact {
+  min-height: 56px;
+}
+
+.devtool-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+  margin: 14px 0;
+}
+
+.devtool-stat {
+  padding: 12px;
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  background: rgba(14, 124, 102, 0.07);
+  text-align: center;
+}
+
+.devtool-stat strong {
+  display: block;
+  font-size: 18px;
+  color: var(--primary-strong);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.devtool-stat span {
+  display: block;
+  margin-top: 4px;
+  color: var(--text-secondary);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.url-parts-output {
+  display: grid;
+  gap: 8px;
+}
+
+.url-part-row {
+  display: grid;
+  grid-template-columns: 110px 1fr;
+  gap: 10px;
+  align-items: start;
+  padding: 9px 10px;
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.68);
+}
+
+.url-part-row span {
+  color: var(--text-secondary);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.url-part-row code {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  word-break: break-all;
+}
+
+.devtool-table-wrap {
+  overflow: auto;
+  max-height: 420px;
+}
+
+.devtool-table {
+  min-width: 520px;
+}
+
+@media (max-width: 720px) {
+  .devtool-output-grid,
+  .devtool-stats-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .url-part-row {
+    grid-template-columns: 1fr;
+  }
+}
+
 /* ---- 编码转换器 ---- */
 
 .enc-btn-grid {
@@ -2063,6 +2231,151 @@ button:disabled {
   }
 }
 
+/* ---- Cron 解析器 ---- */
+
+.cron-toolbar,
+.color-converter-toolbar {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.cron-toolbar input,
+.color-converter-toolbar input {
+  flex: 1 1 320px;
+}
+
+.cron-examples {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 14px 0;
+}
+
+.cron-summary-wrap {
+  margin-top: 12px;
+}
+
+.cron-summary-card {
+  padding: 14px 16px;
+  border-radius: 14px;
+  background: rgba(14, 124, 102, 0.08);
+  color: var(--primary-strong);
+  font-weight: 600;
+}
+
+.cron-empty {
+  margin: 0;
+  color: var(--text-secondary);
+}
+
+.cron-fields-wrap {
+  margin-top: 14px;
+}
+
+.cron-fields-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.cron-field-card {
+  border: 1px solid var(--border-color);
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.76);
+  padding: 12px 14px;
+}
+
+.cron-field-name {
+  display: block;
+  font-size: 12px;
+  color: var(--text-secondary);
+  margin-bottom: 8px;
+  font-weight: 600;
+}
+
+.cron-field-token {
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-size: 13px;
+  margin-bottom: 8px;
+}
+
+.cron-field-desc {
+  margin: 0;
+  color: var(--text);
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+/* ---- 颜色格式转换 ---- */
+
+.color-converter-layout {
+  display: grid;
+  grid-template-columns: 1.1fr 1fr;
+  gap: 16px;
+  margin-top: 14px;
+}
+
+.color-converter-preview-card,
+.color-converter-formats-card {
+  border: 1px solid var(--border-color);
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.7);
+  padding: 16px;
+}
+
+.color-converter-preview-card h3,
+.color-converter-formats-card h3 {
+  margin: 0 0 12px;
+  font-size: 16px;
+}
+
+.color-converter-swatch {
+  height: 140px;
+  border-radius: 16px;
+  background: var(--swatch);
+  border: 1px solid rgba(22, 32, 43, 0.08);
+}
+
+.color-converter-preview-meta {
+  margin-top: 12px;
+}
+
+.color-converter-preview-meta code,
+.color-format-value {
+  font-family: var(--font-mono);
+  font-size: 13px;
+}
+
+.color-converter-empty {
+  margin: 0;
+  color: var(--text-secondary);
+}
+
+.color-converter-formats {
+  display: grid;
+  gap: 10px;
+}
+
+.color-format-card {
+  display: grid;
+  grid-template-columns: 56px 1fr auto;
+  gap: 12px;
+  align-items: center;
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 12px;
+  background: rgba(255, 255, 255, 0.8);
+}
+
+.color-format-label {
+  font-size: 12px;
+  color: var(--text-secondary);
+  font-weight: 600;
+}
+
 /* ---- UUID 生成器 ---- */
 
 .uuid-toolbar {
@@ -2291,5 +2604,14 @@ button:disabled {
 
   .jwt-secret-input {
     width: 100%;
+  }
+
+  .cron-fields-grid,
+  .color-converter-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .color-format-card {
+    grid-template-columns: 1fr;
   }
 }
