@@ -2615,3 +2615,361 @@ button:disabled {
     grid-template-columns: 1fr;
   }
 }
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: #f4f7fb;
+  color: #172033;
+  font-family: Inter, "Segoe UI", "Microsoft YaHei", Arial, sans-serif;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+[data-theme="dark"] body {
+  background: #10141c;
+  color: #eef3fb;
+}
+
+.app-frame {
+  display: grid;
+  grid-template-columns: 264px minmax(0, 1fr);
+  min-height: 100vh;
+}
+
+.app-sidebar {
+  position: sticky;
+  top: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  height: 100vh;
+  padding: 18px;
+  overflow-y: auto;
+  background: #ffffff;
+  border-right: 1px solid #d9e2ef;
+}
+
+[data-theme="dark"] .app-sidebar {
+  background: #161c27;
+  border-right-color: #2b3547;
+}
+
+.brand-button {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 10px 12px;
+  color: inherit;
+  text-align: left;
+  background: transparent;
+  border: 0;
+}
+
+.brand-button span {
+  display: inline-grid;
+  width: 36px;
+  height: 36px;
+  place-items: center;
+  color: #ffffff;
+  background: #2563eb;
+  border-radius: 8px;
+  font-weight: 700;
+}
+
+.side-nav {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.side-nav button {
+  width: 100%;
+  padding: 9px 10px;
+  color: inherit;
+  text-align: left;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 8px;
+}
+
+.side-nav button:hover,
+.side-nav button.active {
+  background: #edf4ff;
+  border-color: #bfd4ff;
+}
+
+[data-theme="dark"] .side-nav button:hover,
+[data-theme="dark"] .side-nav button.active {
+  background: #1f2b3d;
+  border-color: #385072;
+}
+
+.preferences-panel {
+  display: grid;
+  gap: 10px;
+  padding-top: 12px;
+  border-top: 1px solid #d9e2ef;
+}
+
+.preferences-panel label,
+.search-box {
+  display: grid;
+  gap: 6px;
+  font-size: 13px;
+  color: #5b677a;
+}
+
+[data-theme="dark"] .preferences-panel label,
+[data-theme="dark"] .search-box {
+  color: #a9b4c5;
+}
+
+.preferences-panel select,
+.search-box input,
+.tool-control,
+.tool-panel input,
+.tool-panel select,
+.tool-panel textarea {
+  width: 100%;
+  padding: 10px 12px;
+  color: inherit;
+  background: #ffffff;
+  border: 1px solid #cfd9e8;
+  border-radius: 8px;
+}
+
+[data-theme="dark"] .preferences-panel select,
+[data-theme="dark"] .search-box input,
+[data-theme="dark"] .tool-control,
+[data-theme="dark"] .tool-panel input,
+[data-theme="dark"] .tool-panel select,
+[data-theme="dark"] .tool-panel textarea {
+  background: #111722;
+  border-color: #334056;
+}
+
+.app-main {
+  min-width: 0;
+  padding: 28px;
+}
+
+.workbench,
+.tool-layout {
+  width: min(1180px, 100%);
+  margin: 0 auto;
+}
+
+.workbench-header,
+.tool-layout-header {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(260px, 380px);
+  gap: 24px;
+  align-items: end;
+  margin-bottom: 20px;
+}
+
+.tool-kicker {
+  margin: 0 0 6px;
+  color: #2563eb;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0;
+  text-transform: uppercase;
+}
+
+.workbench h1,
+.tool-layout h1 {
+  margin: 0;
+  font-size: 32px;
+  line-height: 1.15;
+}
+
+.workbench-header p,
+.tool-layout-header p {
+  margin: 8px 0 0;
+  color: #5b677a;
+}
+
+[data-theme="dark"] .workbench-header p,
+[data-theme="dark"] .tool-layout-header p {
+  color: #a9b4c5;
+}
+
+.category-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 18px 0 24px;
+}
+
+.category-tabs button,
+.icon-btn,
+.tool-actions button {
+  min-height: 36px;
+  padding: 8px 12px;
+  color: inherit;
+  background: #ffffff;
+  border: 1px solid #cfd9e8;
+  border-radius: 8px;
+}
+
+.category-tabs button.active,
+.category-tabs button:hover,
+.icon-btn:hover,
+.tool-actions button:hover {
+  background: #edf4ff;
+  border-color: #9bbcff;
+}
+
+[data-theme="dark"] .category-tabs button,
+[data-theme="dark"] .icon-btn,
+[data-theme="dark"] .tool-actions button {
+  background: #161c27;
+  border-color: #334056;
+}
+
+.tool-section {
+  margin-top: 28px;
+}
+
+.tool-section h2 {
+  margin: 0 0 12px;
+  font-size: 18px;
+}
+
+.tool-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 14px;
+}
+
+.tool-card {
+  position: relative;
+  display: grid;
+  min-height: 156px;
+  background: #ffffff;
+  border: 1px solid #d9e2ef;
+  border-radius: 8px;
+  box-shadow: 0 1px 2px rgb(15 23 42 / 6%);
+}
+
+[data-theme="dark"] .tool-card {
+  background: #161c27;
+  border-color: #2b3547;
+}
+
+.tool-card-main {
+  display: grid;
+  gap: 8px;
+  padding: 16px 48px 16px 16px;
+  color: inherit;
+  text-align: left;
+  background: transparent;
+  border: 0;
+}
+
+.tool-card-main h3 {
+  margin: 0;
+  font-size: 17px;
+}
+
+.tool-card-main p {
+  margin: 0;
+  color: #5b677a;
+  line-height: 1.5;
+}
+
+[data-theme="dark"] .tool-card-main p {
+  color: #a9b4c5;
+}
+
+.tool-card-category {
+  color: #2563eb;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.tool-card .icon-btn {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  width: 34px;
+  min-height: 34px;
+  padding: 0;
+}
+
+.tool-layout-body,
+.tool-panel,
+.tool-stub,
+.error-panel,
+.loading-state {
+  padding: 18px;
+  background: #ffffff;
+  border: 1px solid #d9e2ef;
+  border-radius: 8px;
+}
+
+[data-theme="dark"] .tool-layout-body,
+[data-theme="dark"] .tool-panel,
+[data-theme="dark"] .tool-stub,
+[data-theme="dark"] .error-panel,
+[data-theme="dark"] .loading-state {
+  background: #161c27;
+  border-color: #2b3547;
+}
+
+.empty-state,
+.error-panel span {
+  color: #6b7280;
+}
+
+[data-density="compact"] .app-main {
+  padding: 18px;
+}
+
+[data-density="compact"] .tool-card {
+  min-height: 132px;
+}
+
+[data-density="compact"] .tool-card-main,
+[data-density="compact"] .tool-layout-body,
+[data-density="compact"] .tool-panel {
+  padding: 12px;
+}
+
+@media (max-width: 860px) {
+  .app-frame {
+    grid-template-columns: 1fr;
+  }
+
+  .app-sidebar {
+    position: static;
+    height: auto;
+  }
+
+  .side-nav {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+    max-height: 220px;
+    overflow-y: auto;
+  }
+
+  .workbench-header,
+  .tool-layout-header {
+    grid-template-columns: 1fr;
+  }
+}
