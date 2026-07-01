@@ -6,7 +6,7 @@
 
 **Architecture:** Vite owns development and static production builds. React renders the app shell, home workbench, routes, and tool pages from one typed registry. Each tool owns its React component and typed logic module, while shared browser utilities live under `src/shared`.
 
-**Tech Stack:** Vite, React, TypeScript, Node test runner, CSS, GitHub Pages static deployment.
+**Tech Stack:** Vite, React, TypeScript, tsx with the Node test runner, CSS, GitHub Pages static deployment.
 
 ## Global Constraints
 
@@ -35,7 +35,7 @@
 - Create or convert `src/shared/*.ts`: storage, clipboard, format, validation, URL, object, stats, color helpers.
 - Replace each `src/tools/<tool>/{index.js,data.js,render.js}` with `meta.ts`, `logic.ts`, and `Tool.tsx` as applicable.
 - Modify `.github/workflows/*.yml`: build the Vite app and upload `dist`.
-- Replace tests with TypeScript-aware or JavaScript Node tests that import built source through tsx-compatible execution.
+- Replace tests with TypeScript-aware Node tests run through `tsx --test`.
 
 ---
 
@@ -76,7 +76,7 @@ Create `package.json` with this content:
     "dev": "vite --host 127.0.0.1",
     "build": "tsc -b && vite build",
     "preview": "vite preview --host 127.0.0.1",
-    "test": "node --test tests/*.test.mjs",
+    "test": "tsx --test tests/*.test.mjs",
     "typecheck": "tsc -b --pretty false"
   },
   "dependencies": {
@@ -86,7 +86,9 @@ Create `package.json` with this content:
     "react": "^18.3.1",
     "react-dom": "^18.3.1"
   },
-  "devDependencies": {}
+  "devDependencies": {
+    "tsx": "^4.19.2"
+  }
 }
 ```
 
@@ -702,7 +704,7 @@ git commit -m "feat: add React app shell and tool workbench"
 
 - [ ] **Step 1: Expand logic tests for shared expectations**
 
-Keep the existing YAML, XML, URL, and CSV assertions. Add assertions that import `.ts` files after conversion through compiled build output only if Node cannot import TypeScript directly. During implementation, prefer testing logic through `npm run build` and then importing `dist/assets` only for bundle smoke; keep direct pure logic tests in `.mjs` for converted `.js` files until a test runner is introduced.
+Keep the existing YAML, XML, URL, and CSV assertions. Update imports to target converted `.ts` logic modules directly; `npm test` runs through `tsx --test`, so TypeScript source imports are supported.
 
 - [ ] **Step 2: Convert shared helpers to TypeScript**
 
