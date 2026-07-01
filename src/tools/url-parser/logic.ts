@@ -1,4 +1,10 @@
-export function parseUrl(input) {
+export type QueryRow = {
+  index: number;
+  key: string;
+  value: string;
+};
+
+export function parseUrl(input: string) {
   try {
     const text = input.trim();
     if (!text) return { error: "请输入 URL" };
@@ -10,7 +16,7 @@ export function parseUrl(input) {
         href: url.href,
         protocol: url.protocol,
         username: url.username,
-        password: url.password ? "••••••" : "",
+        password: url.password ? "•••••" : "",
         host: url.host,
         hostname: url.hostname,
         port: url.port || defaultPort(url.protocol),
@@ -23,20 +29,21 @@ export function parseUrl(input) {
       queryJson: queryToJson(query),
     };
   } catch (error) {
-    return { error: `URL 解析失败：${error.message}` };
+    return { error: `URL 解析失败：${error instanceof Error ? error.message : String(error)}` };
   }
 }
 
-function defaultPort(protocol) {
+function defaultPort(protocol: string) {
   if (protocol === "https:") return "443";
   if (protocol === "http:") return "80";
   return "";
 }
 
-function queryToJson(query) {
-  return query.reduce((acc, item) => {
+function queryToJson(query: QueryRow[]) {
+  return query.reduce<Record<string, string | string[]>>((acc, item) => {
     if (Object.prototype.hasOwnProperty.call(acc, item.key)) {
-      acc[item.key] = Array.isArray(acc[item.key]) ? [...acc[item.key], item.value] : [acc[item.key], item.value];
+      const current = acc[item.key];
+      acc[item.key] = Array.isArray(current) ? [...current, item.value] : [current, item.value];
     } else {
       acc[item.key] = item.value;
     }
@@ -44,7 +51,7 @@ function queryToJson(query) {
   }, {});
 }
 
-export function buildUrl(query) {
+export function buildUrl(query: QueryRow[]) {
   return query.map(({ key, value }) => `${encodeURIComponent(key)}=${encodeURIComponent(value)}`).join("&");
 }
 

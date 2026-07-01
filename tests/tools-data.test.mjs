@@ -10,7 +10,7 @@ async function importModule(relativePath) {
 }
 
 async function testYamlFormatter() {
-  const { formatYaml, yamlToJson, jsonToYaml } = await importModule("src/tools/yaml-formatter/data.js");
+  const { formatYaml, yamlToJson, jsonToYaml } = await importModule("src/tools/yaml-formatter/logic.ts");
   const input = "name: demo\nactive: true\nitems:\n  - api\n  - web\ncount: 2";
   const formatted = formatYaml(input);
   assert.equal(formatted.error, null);
@@ -26,7 +26,7 @@ async function testYamlFormatter() {
 }
 
 async function testXmlFormatter() {
-  const { formatXml, compactXml, xmlToJson } = await importModule("src/tools/xml-formatter/data.js");
+  const { formatXml, compactXml, xmlToJson } = await importModule("src/tools/xml-formatter/logic.ts");
   const input = '<root><item id="1">A</item><item id="2">B</item></root>';
   const formatted = formatXml(input);
   assert.equal(formatted.error, null);
@@ -41,20 +41,20 @@ async function testXmlFormatter() {
 }
 
 async function testUrlParser() {
-  const { parseUrl, buildUrl } = await importModule("src/tools/url-parser/data.js");
+  const { parseUrl, buildUrl } = await importModule("src/tools/url-parser/logic.ts");
   const parsed = parseUrl("https://user:secret@example.com:8443/path/to?a=1&a=2&empty=#top");
   assert.equal(parsed.error, null);
   assert.equal(parsed.parts.hostname, "example.com");
   assert.equal(parsed.query.length, 3);
   assert.deepEqual(parsed.queryJson.a, ["1", "2"]);
-  assert.equal(parsed.parts.password, "••••••");
+  assert.equal(parsed.parts.password, "•••••");
 
   const rebuilt = buildUrl(parsed.query);
   assert.match(rebuilt, /a=1&a=2&empty=/);
 }
 
 async function testCsvConverter() {
-  const { parseCsv, csvToJson } = await importModule("src/tools/csv-converter/data.js");
+  const { parseCsv, csvToJson } = await importModule("src/tools/csv-converter/logic.ts");
   const input = 'name,role,note\nAlice,dev,"hello, world"\nBob,ops,"line"';
   const parsed = parseCsv(input, { delimiter: "auto", hasHeader: true });
   assert.equal(parsed.error, null);
@@ -67,7 +67,7 @@ async function testCsvConverter() {
 }
 
 async function run() {
-  await fs.access(path.join(root, "src/tools/yaml-formatter/data.js"));
+  await fs.access(path.join(root, "src/tools/yaml-formatter/logic.ts"));
   await testYamlFormatter();
   await testXmlFormatter();
   await testUrlParser();
