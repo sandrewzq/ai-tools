@@ -66,12 +66,23 @@ async function testCsvConverter() {
   assert.equal(JSON.parse(json.output)[1].name, "Bob");
 }
 
+async function testGeneratedToolLogic() {
+  const { generateBatch } = await importModule("src/tools/uuid-generator/logic.ts");
+  const { convertColor } = await importModule("src/tools/color-converter/logic.ts");
+  const { parseCron } = await importModule("src/tools/cron-parser/logic.ts");
+
+  assert.equal(generateBatch(2, "v4", false, false).length, 2);
+  assert.equal(convertColor("#ffffff").hex, "#FFFFFF");
+  assert.equal(parseCron("*/5 * * * *").error, null);
+}
+
 async function run() {
   await fs.access(path.join(root, "src/tools/yaml-formatter/logic.ts"));
   await testYamlFormatter();
   await testXmlFormatter();
   await testUrlParser();
   await testCsvConverter();
+  await testGeneratedToolLogic();
   console.log("tools-data tests passed");
 }
 

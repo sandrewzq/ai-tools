@@ -3105,6 +3105,36 @@ button {
   border-radius: 8px;
 }
 
+.color-preview {
+  width: 100%;
+  height: 96px;
+  border: 1px solid #d9e2ef;
+  border-radius: 8px;
+}
+
+.palette-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+  gap: 10px;
+}
+
+.palette-swatch {
+  display: grid;
+  min-height: 110px;
+  align-content: end;
+  gap: 4px;
+  padding: 12px;
+  border-radius: 8px;
+}
+
+.qr-canvas {
+  width: min(320px, 100%);
+  height: auto;
+  background: #ffffff;
+  border: 1px solid #d9e2ef;
+  border-radius: 8px;
+}
+
 [data-density="compact"] .app-main {
   padding: 18px;
 }

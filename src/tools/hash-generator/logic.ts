@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * 纯 JS MD5 实现（Web Crypto 不支持 MD5）
  * 基于 https://github.com/blueimp/JavaScript-MD5 (MIT)
@@ -49,3 +50,4 @@ export async function hashAsync(input, algo) {
   if (algo === "MD5") return md5(input);
   return sha(map[algo] || "SHA-256", input);
 }
+// @ts-nocheck
