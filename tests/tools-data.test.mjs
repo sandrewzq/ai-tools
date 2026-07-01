@@ -123,6 +123,35 @@ async function testSpeedBenchmarkKeepsMultiTargetSummary() {
   assert.equal(summary[0].avgTokensPerSecond, 50);
 }
 
+async function testColorPaletteKeepsOriginalFeatures() {
+  const source = await fs.readFile(path.join(root, "src/tools/color-palette/Tool.tsx"), "utf8");
+  assert.ok(source.includes("palette-mode-tabs"), "Color palette should keep auto/preset mode tabs");
+  assert.ok(source.includes("palette-preview"), "Color palette should keep the UI preview panel");
+  assert.ok(source.includes("palette-copy-grid"), "Color palette should keep CSS and guide outputs");
+
+  const {
+    buildGeneratedPalette,
+    buildPaletteCss,
+    buildPaletteGuide,
+    buildPresetPalette,
+    palettePresetConfig,
+    paletteStyleConfig,
+  } = await importModule("src/tools/color-palette/logic.ts");
+
+  const presets = palettePresetConfig();
+  assert.equal(Object.keys(presets).length, 17, "Color palette should keep all original presets");
+  assert.equal(presets.sakura.name, "雾白深蓝");
+
+  const generated = buildGeneratedPalette({ h: 217, s: 91, l: 60 }, paletteStyleConfig("tech"));
+  assert.deepEqual(generated.map((color) => color.role), ["primary", "secondary", "accent", "background", "surface", "text", "muted"]);
+
+  const preset = buildPresetPalette(presets.sakura);
+  const css = buildPaletteCss(preset);
+  const guide = buildPaletteGuide(presets.sakura.name, preset, true);
+  assert.match(css, /--color-primary: #2563EB/);
+  assert.match(guide, /精选方案：雾白深蓝/);
+}
+
 async function run() {
   await fs.access(path.join(root, "src/tools/yaml-formatter/logic.ts"));
   await testYamlFormatter();
@@ -132,6 +161,7 @@ async function run() {
   await testGeneratedToolLogic();
   await testQrGeneratorUsesRealEncoder();
   await testSpeedBenchmarkKeepsMultiTargetSummary();
+  await testColorPaletteKeepsOriginalFeatures();
   console.log("tools-data tests passed");
 }
 
