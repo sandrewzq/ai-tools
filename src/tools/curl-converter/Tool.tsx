@@ -1,0 +1,5 @@
+import { ToolStub } from "../../components/ToolStub";
+
+export default function Tool() {
+  return <ToolStub title="cURL 转代码" />;
+}
