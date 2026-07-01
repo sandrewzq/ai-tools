@@ -76,6 +76,53 @@ async function testGeneratedToolLogic() {
   assert.equal(parseCron("*/5 * * * *").error, null);
 }
 
+async function testQrGeneratorUsesRealEncoder() {
+  const source = await fs.readFile(path.join(root, "src/tools/qr-generator/logic.ts"), "utf8");
+  assert.ok(source.includes("Reed-Solomon ECC"), "QR generator should keep the original ECC encoder");
+  assert.ok(!source.includes("seededCell"), "QR generator should not use the temporary seeded matrix fallback");
+
+  const { generateQR } = await importModule("src/tools/qr-generator/logic.ts");
+  const result = generateQR("https://example.com");
+  assert.equal(result.error, null);
+  assert.equal(result.size, result.version * 4 + 17);
+  assert.equal(result.matrix.length, result.size);
+}
+
+async function testSpeedBenchmarkKeepsMultiTargetSummary() {
+  const source = await fs.readFile(path.join(root, "src/tools/speed-test/logic.ts"), "utf8");
+  const providers = await fs.readFile(path.join(root, "src/tools/speed-test/providers.ts"), "utf8");
+  assert.ok(source.includes("targets: SpeedTarget[]"), "Speed test should keep multi-target config");
+  assert.ok(source.includes("warmupRounds"), "Speed test should keep warmup rounds");
+  assert.ok(providers.includes("stream: true"), "Speed providers should keep streaming requests for TTFT");
+  assert.ok(providers.includes("readSseStream"), "Speed providers should parse SSE streams");
+
+  const { buildSummary, createTarget, defaultEndpointFor } = await importModule("src/tools/speed-test/logic.ts");
+  assert.equal(defaultEndpointFor("anthropic"), "/messages");
+  assert.equal(defaultEndpointFor("ollama"), "/api/generate");
+  assert.equal(createTarget("openai").enabled, true);
+  const summary = buildSummary([
+    {
+      targetName: "A",
+      kind: "openai",
+      round: 1,
+      warmup: false,
+      status: "ok",
+      ttftMs: 100,
+      totalLatencyMs: 500,
+      outputDurationMs: 400,
+      promptTokens: 10,
+      completionTokens: 20,
+      tokensPerSecond: 50,
+      providerTokensPerSecond: null,
+      tokenSource: "api",
+      note: "",
+    },
+  ]);
+  assert.equal(summary[0].targetName, "A");
+  assert.equal(summary[0].okCount, 1);
+  assert.equal(summary[0].avgTokensPerSecond, 50);
+}
+
 async function run() {
   await fs.access(path.join(root, "src/tools/yaml-formatter/logic.ts"));
   await testYamlFormatter();
@@ -83,6 +130,8 @@ async function run() {
   await testUrlParser();
   await testCsvConverter();
   await testGeneratedToolLogic();
+  await testQrGeneratorUsesRealEncoder();
+  await testSpeedBenchmarkKeepsMultiTargetSummary();
   console.log("tools-data tests passed");
 }
 

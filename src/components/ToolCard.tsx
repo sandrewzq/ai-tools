@@ -9,14 +9,21 @@ type Props = {
 
 export function ToolCard({ tool, favorite, onOpen, onToggleFavorite }: Props) {
   return (
-    <article className="tool-card">
-      <button className="tool-card-main" type="button" onClick={() => onOpen(tool.meta.route)}>
-        <span className="tool-card-category">{tool.meta.category}</span>
-        <h3>{tool.meta.title}</h3>
+    <article className="tool-card react-tool-card">
+      <a
+        className="tool-card-link"
+        href={`#${tool.meta.route}`}
+        onClick={(event) => {
+          event.preventDefault();
+          onOpen(tool.meta.route);
+        }}
+      >
+        <span className="tool-card-kicker">{tool.meta.kicker || tool.meta.category}</span>
+        <strong>{tool.meta.title}</strong>
         <p>{tool.meta.description}</p>
-      </button>
+      </a>
       <button
-        className="icon-btn"
+        className="favorite-btn"
         type="button"
         aria-label={favorite ? "取消收藏" : "收藏"}
         title={favorite ? "取消收藏" : "收藏"}

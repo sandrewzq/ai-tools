@@ -37,12 +37,7 @@ export function HomeWorkbench({ tools, favoriteIds, recentIds, isFavorite, onOpe
   const filteredTools = useMemo(() => {
     return tools.filter((tool) => {
       const categoryMatch = category === "all" || tool.meta.category === category;
-      const searchText = [
-        tool.meta.title,
-        tool.meta.description,
-        tool.meta.category,
-        ...tool.meta.tags,
-      ].join(" ").toLowerCase();
+      const searchText = [tool.meta.title, tool.meta.description, tool.meta.category, tool.meta.kicker, ...tool.meta.tags].join(" ").toLowerCase();
       return categoryMatch && (!normalizedQuery || searchText.includes(normalizedQuery));
     });
   }, [category, normalizedQuery, tools]);
@@ -51,44 +46,46 @@ export function HomeWorkbench({ tools, favoriteIds, recentIds, isFavorite, onOpe
   const recentTools = byIds(tools, recentIds);
 
   return (
-    <section className="workbench">
-      <header className="workbench-header">
-        <div>
-          <p className="tool-kicker">AI Tools</p>
-          <h1>AI 工具箱</h1>
-          <p>搜索、收藏并快速打开常用开发工具。</p>
+    <main className="layout tool-view">
+      <section className="panel tools-home-panel">
+        <div className="section-head">
+          <div>
+            <p className="section-tag">Tools</p>
+            <h2>工具导航</h2>
+          </div>
         </div>
-        <SearchBox value={query} onChange={setQuery} />
-      </header>
+        <div className="home-filter-bar">
+          <SearchBox value={query} onChange={setQuery} />
+          <div className="category-tabs" aria-label="工具分类">
+            <button className={category === "all" ? "active" : ""} type="button" onClick={() => setCategory("all")}>
+              {CATEGORY_LABELS.all}
+            </button>
+            {categories.map((item) => (
+              <button className={category === item ? "active" : ""} type="button" key={item} onClick={() => setCategory(item)}>
+                {CATEGORY_LABELS[item]}
+              </button>
+            ))}
+          </div>
+        </div>
 
-      <div className="category-tabs" aria-label="工具分类">
-        <button className={category === "all" ? "active" : ""} type="button" onClick={() => setCategory("all")}>
-          {CATEGORY_LABELS.all}
-        </button>
-        {categories.map((item) => (
-          <button className={category === item ? "active" : ""} type="button" key={item} onClick={() => setCategory(item)}>
-            {CATEGORY_LABELS[item]}
-          </button>
-        ))}
-      </div>
+        {favoriteTools.length > 0 ? (
+          <ToolSection title="收藏" tools={favoriteTools} isFavorite={isFavorite} onOpen={onOpen} onToggleFavorite={onToggleFavorite} />
+        ) : null}
 
-      {favoriteTools.length > 0 ? (
-        <ToolSection title="收藏" tools={favoriteTools} isFavorite={isFavorite} onOpen={onOpen} onToggleFavorite={onToggleFavorite} />
-      ) : null}
+        {recentTools.length > 0 ? (
+          <ToolSection title="最近使用" tools={recentTools} isFavorite={isFavorite} onOpen={onOpen} onToggleFavorite={onToggleFavorite} />
+        ) : null}
 
-      {recentTools.length > 0 ? (
-        <ToolSection title="最近使用" tools={recentTools} isFavorite={isFavorite} onOpen={onOpen} onToggleFavorite={onToggleFavorite} />
-      ) : null}
-
-      <ToolSection
-        title="全部工具"
-        tools={filteredTools}
-        emptyText="没有匹配的工具"
-        isFavorite={isFavorite}
-        onOpen={onOpen}
-        onToggleFavorite={onToggleFavorite}
-      />
-    </section>
+        <ToolSection
+          title={favoriteTools.length || recentTools.length ? "全部工具" : ""}
+          tools={filteredTools}
+          emptyText="没有匹配的工具"
+          isFavorite={isFavorite}
+          onOpen={onOpen}
+          onToggleFavorite={onToggleFavorite}
+        />
+      </section>
+    </main>
   );
 }
 
@@ -109,7 +106,7 @@ function ToolSection({
 }) {
   return (
     <section className="tool-section">
-      <h2>{title}</h2>
+      {title ? <h3 className="react-section-title">{title}</h3> : null}
       {tools.length > 0 ? (
         <div className="tool-grid">
           {tools.map((tool) => (

@@ -9,16 +9,21 @@ type Props = {
 
 export function ToolLayout({ title, description, actions, children }: Props) {
   return (
-    <section className="tool-layout">
-      <header className="tool-layout-header">
-        <div>
-          <p className="tool-kicker">工具</p>
-          <h1>{title}</h1>
-          <p>{description}</p>
+    <main className="layout tool-view">
+      <section className="panel tool-title-panel">
+        <div className="section-head compact">
+          <div>
+            <p className="section-tag">Tool</p>
+            <h2>{title}</h2>
+          </div>
+          <a className="ghost-link" href="#home">
+            返回工具首页
+          </a>
         </div>
-        {actions ? <div className="tool-actions">{actions}</div> : null}
-      </header>
-      <div className="tool-layout-body">{children}</div>
-    </section>
+        <p className="tip">{description}</p>
+        {actions ? <div className="action-bar react-tool-actions">{actions}</div> : null}
+      </section>
+      {children}
+    </main>
   );
 }

@@ -14,6 +14,7 @@ export type ToolMeta = {
   id: string;
   route: string;
   title: string;
+  kicker?: string;
   category: ToolCategory;
   description: string;
   tags: string[];

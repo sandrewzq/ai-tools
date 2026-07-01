@@ -24,7 +24,7 @@ export default function Tool() {
       <div className="tool-panel tool-stack">
         <textarea value={text} onChange={(event) => setText(event.target.value)} rows={4} />
         {result.error ? <p className="tool-status">{result.error}</p> : <div className="stat-grid"><span>版本: {result.version}</span><span>尺寸: {result.size} x {result.size}</span></div>}
-        <canvas className="qr-canvas" ref={canvasRef} />
+        <canvas className="qr-canvas" ref={canvasRef} style={{ display: result.error ? "none" : "block" }} />
         <button type="button" onClick={download}>下载 PNG</button>
       </div>
     </ToolLayout>
