@@ -1,16 +1,20 @@
 # 工具目录约定
 
-每个新工具都放在独立目录中，例如 `src/tools/my-tool/`。工具目录只保存自身业务，不直接引用其他工具目录。
+每个工具放在独立目录中，例如 `src/tools/json-formatter/`。
 
-推荐文件结构：
+推荐结构：
 
 ```text
-my-tool
-├─ index.js
-├─ state.js
-├─ render.js
-├─ service.js
-└─ config.js
+my-tool/
+  Tool.tsx
+  logic.ts
 ```
 
-公共函数放到 `src/shared/`，路由、注册、生命周期这类项目级能力放到 `src/core/`。
+约定：
+
+- `Tool.tsx` 默认导出 React 组件。
+- `logic.ts` 保存可测试的纯逻辑。
+- 工具元信息集中在 `src/app/tool-registry.ts`。
+- 公共函数放到 `src/shared/`。
+- 公共 UI 放到 `src/components/`。
+- 工具目录之间不要直接互相引用。
