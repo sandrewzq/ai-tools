@@ -6,7 +6,8 @@ import test from "node:test";
 import { fileURLToPath } from "node:url";
 import { chromium } from "playwright";
 
-const mojibakePattern = /�|鎼|杩|宸|澶|鐨|瑙|缂|鍦|銆|鈽|乁|丄|丱|丳|€|⑩|鏍|涓|鍏|鏈|鐢|鍙|浣|瀹|鏃|鍖/;
+const mojibakePattern =
+  /\uFFFD|\u93BC|\u677B|\u5BA6|\u6FB6|\u9428|\u7F02|\u9366|\u9286|\u921D|\u4E41|\u4E44|\u4E31|\u4E33|\u20AC|\u2469|\u93CD|\u6D93|\u934F|\u93C8|\u9422|\u53D9|\u6D63|\u7039|\u93C3/;
 
 const routes = [
   "home",

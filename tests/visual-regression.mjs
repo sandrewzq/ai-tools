@@ -85,7 +85,7 @@ async function captureCase(page, baseUrl, item) {
   });
   await page.locator("h1, h2").first().waitFor({ state: "visible", timeout: 5000 });
   if (item.action === "json-validate") {
-    await page.getByRole("button", { name: /校验|鏍￠獙/ }).click();
+    await page.getByRole("button", { name: /校验/ }).click();
   }
   for (const selector of item.selectors) {
     await page.locator(selector).first().waitFor({ state: "visible", timeout: 5000 });
