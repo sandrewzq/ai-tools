@@ -1,10 +1,6 @@
 import assert from "node:assert/strict";
-import http from "node:http";
-import { spawn } from "node:child_process";
-import { once } from "node:events";
 import test from "node:test";
-import { fileURLToPath } from "node:url";
-import { chromium } from "playwright";
+import { collectConsoleErrors, launchBrowser, withPreview } from "./helpers/browser.mjs";
 
 const mojibakePattern =
   /\uFFFD|\u93BC|\u677B|\u5BA6|\u6FB6|\u9428|\u7F02|\u9366|\u9286|\u921D|\u4E41|\u4E44|\u4E31|\u4E33|\u20AC|\u2469|\u93CD|\u6D93|\u934F|\u93C8|\u9422|\u53D9|\u6D63|\u7039|\u93C3/;
@@ -191,81 +187,4 @@ async function expectVisible(page, selector) {
   const locator = page.locator(selector).first();
   await locator.waitFor({ state: "visible", timeout: 5000 });
   assert.ok(await locator.isVisible(), `${selector} should be visible`);
-}
-
-async function launchBrowser() {
-  const executablePath = process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE || localChromePath();
-  const browser = await chromium.launch({
-    headless: true,
-    ...(executablePath ? { executablePath } : {}),
-  });
-  return { browser, errors: [] };
-}
-
-function localChromePath() {
-  return process.platform === "win32" ? "C:/Program Files/Google/Chrome/Application/chrome.exe" : undefined;
-}
-
-function collectConsoleErrors(page, errors) {
-  page.on("console", (message) => {
-    if (message.type() === "error") {
-      errors.push(message.text());
-    }
-  });
-  page.on("pageerror", (error) => {
-    errors.push(error.message);
-  });
-}
-
-async function withPreview(callback) {
-  const port = await getFreePort();
-  const baseUrl = `http://127.0.0.1:${port}`;
-  const viteBin = fileURLToPath(new URL("../node_modules/vite/bin/vite.js", import.meta.url));
-  const child = spawn(process.execPath, [viteBin, "preview", "--host", "127.0.0.1", "--port", String(port), "--strictPort"], {
-    cwd: new URL("..", import.meta.url),
-    stdio: ["ignore", "pipe", "pipe"],
-    env: { ...process.env, BROWSER: "none" },
-  });
-
-  let output = "";
-  child.stdout.on("data", (chunk) => {
-    output += chunk.toString();
-  });
-  child.stderr.on("data", (chunk) => {
-    output += chunk.toString();
-  });
-
-  try {
-    await waitForUrl(baseUrl, child, () => output);
-    await callback(baseUrl);
-  } finally {
-    child.kill();
-    await Promise.race([once(child, "exit"), new Promise((resolve) => setTimeout(resolve, 2000))]);
-  }
-}
-
-async function getFreePort() {
-  const server = http.createServer();
-  server.listen(0, "127.0.0.1");
-  await once(server, "listening");
-  const { port } = server.address();
-  server.close();
-  await once(server, "close");
-  return port;
-}
-
-async function waitForUrl(url, child, readOutput) {
-  const deadline = Date.now() + 15_000;
-  while (Date.now() < deadline) {
-    if (child.exitCode !== null) {
-      throw new Error(`preview server exited early:\n${readOutput()}`);
-    }
-    try {
-      const response = await fetch(url);
-      if (response.ok) return;
-    } catch {
-      await new Promise((resolve) => setTimeout(resolve, 250));
-    }
-  }
-  throw new Error(`preview server did not start:\n${readOutput()}`);
 }

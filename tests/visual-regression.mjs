@@ -1,13 +1,9 @@
 import assert from "node:assert/strict";
 import fs from "node:fs/promises";
-import http from "node:http";
 import path from "node:path";
-import { spawn } from "node:child_process";
-import { once } from "node:events";
 import test from "node:test";
-import { fileURLToPath } from "node:url";
 import { PNG } from "pngjs";
-import { chromium } from "playwright";
+import { launchBrowser, withPreview } from "./helpers/browser.mjs";
 
 const root = path.resolve(import.meta.dirname, "..");
 const baselinePath = path.join(root, "tests", "visual-baselines.json");
@@ -51,7 +47,7 @@ const cases = [
 
 test("key screens match visual baselines", async () => {
   await withPreview(async (baseUrl) => {
-    const browser = await chromium.launch({ headless: true });
+    const { browser } = await launchBrowser({ localChromeFallback: false });
     try {
       const current = {};
       for (const item of cases) {
@@ -221,57 +217,4 @@ function parseRgb(value) {
 
 function colorDistance(a, b) {
   return Math.sqrt((a[0] - b[0]) ** 2 + (a[1] - b[1]) ** 2 + (a[2] - b[2]) ** 2);
-}
-
-async function withPreview(callback) {
-  const port = await getFreePort();
-  const baseUrl = `http://127.0.0.1:${port}`;
-  const viteBin = fileURLToPath(new URL("../node_modules/vite/bin/vite.js", import.meta.url));
-  const child = spawn(process.execPath, [viteBin, "preview", "--host", "127.0.0.1", "--port", String(port), "--strictPort"], {
-    cwd: new URL("..", import.meta.url),
-    stdio: ["ignore", "pipe", "pipe"],
-    env: { ...process.env, BROWSER: "none" },
-  });
-
-  let output = "";
-  child.stdout.on("data", (chunk) => {
-    output += chunk.toString();
-  });
-  child.stderr.on("data", (chunk) => {
-    output += chunk.toString();
-  });
-
-  try {
-    await waitForUrl(baseUrl, child, () => output);
-    await callback(baseUrl);
-  } finally {
-    child.kill();
-    await Promise.race([once(child, "exit"), new Promise((resolve) => setTimeout(resolve, 2000))]);
-  }
-}
-
-async function getFreePort() {
-  const server = http.createServer();
-  server.listen(0, "127.0.0.1");
-  await once(server, "listening");
-  const { port } = server.address();
-  server.close();
-  await once(server, "close");
-  return port;
-}
-
-async function waitForUrl(url, child, readOutput) {
-  const deadline = Date.now() + 15_000;
-  while (Date.now() < deadline) {
-    if (child.exitCode !== null) {
-      throw new Error(`preview server exited early:\n${readOutput()}`);
-    }
-    try {
-      const response = await fetch(url);
-      if (response.ok) return;
-    } catch {
-      await new Promise((resolve) => setTimeout(resolve, 250));
-    }
-  }
-  throw new Error(`preview server did not start:\n${readOutput()}`);
 }
