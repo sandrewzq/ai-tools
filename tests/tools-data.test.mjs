@@ -10,6 +10,12 @@ async function importModule(relativePath) {
 }
 
 async function testYamlFormatter() {
+  const source = await fs.readFile(path.join(root, "src/tools/yaml-formatter/Tool.tsx"), "utf8");
+  assert.ok(source.includes("devtool-stats-grid"), "YAML formatter should keep original stats cards");
+  assert.ok(source.includes("yaml-json-output"), "YAML formatter should keep JSON preview output");
+  assert.ok(source.includes("yaml-toast"), "YAML formatter should keep copy feedback toast");
+  assert.ok(source.includes("clearAll"), "YAML formatter should keep clear action");
+
   const { formatYaml, yamlToJson, jsonToYaml } = await importModule("src/tools/yaml-formatter/logic.ts");
   const input = "name: demo\nactive: true\nitems:\n  - api\n  - web\ncount: 2";
   const formatted = formatYaml(input);
@@ -26,6 +32,12 @@ async function testYamlFormatter() {
 }
 
 async function testXmlFormatter() {
+  const source = await fs.readFile(path.join(root, "src/tools/xml-formatter/Tool.tsx"), "utf8");
+  assert.ok(source.includes("devtool-stats-grid"), "XML formatter should keep original stats cards");
+  assert.ok(source.includes("xml-tree-output"), "XML formatter should keep tree JSON preview");
+  assert.ok(source.includes("xml-toast"), "XML formatter should keep copy feedback toast");
+  assert.ok(source.includes("clearAll"), "XML formatter should keep clear action");
+
   const { formatXml, compactXml, xmlToJson } = await importModule("src/tools/xml-formatter/logic.ts");
   const input = '<root><item id="1">A</item><item id="2">B</item></root>';
   const formatted = formatXml(input);
@@ -41,6 +53,13 @@ async function testXmlFormatter() {
 }
 
 async function testUrlParser() {
+  const source = await fs.readFile(path.join(root, "src/tools/url-parser/Tool.tsx"), "utf8");
+  assert.ok(source.includes("url-part-row"), "URL parser should keep original part rows");
+  assert.ok(source.includes("devtool-table"), "URL parser should keep query table preview");
+  assert.ok(source.includes("url-rebuilt-output"), "URL parser should keep rebuilt URL output");
+  assert.ok(source.includes("url-toast"), "URL parser should keep copy feedback toast");
+  assert.ok(source.includes("clearAll"), "URL parser should keep clear action");
+
   const { parseUrl, buildUrl } = await importModule("src/tools/url-parser/logic.ts");
   const parsed = parseUrl("https://user:secret@example.com:8443/path/to?a=1&a=2&empty=#top");
   assert.equal(parsed.error, null);
@@ -54,6 +73,13 @@ async function testUrlParser() {
 }
 
 async function testCsvConverter() {
+  const source = await fs.readFile(path.join(root, "src/tools/csv-converter/Tool.tsx"), "utf8");
+  assert.ok(source.includes("devtool-table"), "CSV converter should keep table preview");
+  assert.ok(source.includes("devtool-stats-grid"), "CSV converter should keep original stats cards");
+  assert.ok(source.includes("csv-table-output"), "CSV converter should keep table output region");
+  assert.ok(source.includes("csv-toast"), "CSV converter should keep copy feedback toast");
+  assert.ok(source.includes("clearAll"), "CSV converter should keep clear action");
+
   const { parseCsv, csvToJson } = await importModule("src/tools/csv-converter/logic.ts");
   const input = 'name,role,note\nAlice,dev,"hello, world"\nBob,ops,"line"';
   const parsed = parseCsv(input, { delimiter: "auto", hasHeader: true });
@@ -70,16 +96,36 @@ async function testGeneratedToolLogic() {
   const { generateBatch } = await importModule("src/tools/uuid-generator/logic.ts");
   const { convertColor } = await importModule("src/tools/color-converter/logic.ts");
   const { parseCron } = await importModule("src/tools/cron-parser/logic.ts");
+  const encodingSource = await fs.readFile(path.join(root, "src/tools/encoding-converter/Tool.tsx"), "utf8");
+  const colorConverterSource = await fs.readFile(path.join(root, "src/tools/color-converter/Tool.tsx"), "utf8");
+  const uuidSource = await fs.readFile(path.join(root, "src/tools/uuid-generator/Tool.tsx"), "utf8");
+  const hashSource = await fs.readFile(path.join(root, "src/tools/hash-generator/Tool.tsx"), "utf8");
 
   assert.equal(generateBatch(2, "v4", false, false).length, 2);
   assert.equal(convertColor("#ffffff").hex, "#FFFFFF");
   assert.equal(parseCron("*/5 * * * *").error, null);
+  assert.ok(encodingSource.includes("enc-base64-encode"), "Encoding converter should keep original action ids");
+  assert.ok(encodingSource.includes("encoding-output"), "Encoding converter should keep editable output textarea");
+  assert.ok(encodingSource.includes("swapOutput"), "Encoding converter should keep swap action");
+  assert.ok(encodingSource.includes("encoding-toast"), "Encoding converter should keep copy feedback toast");
+  assert.ok(colorConverterSource.includes("color-converter-swatch"), "Color converter should keep original swatch preview");
+  assert.ok(colorConverterSource.includes("color-format-card"), "Color converter should keep format cards");
+  assert.ok(colorConverterSource.includes("data-copy-value"), "Color converter should keep per-format copy controls");
+  assert.ok(uuidSource.includes("uuid-row"), "UUID generator should keep per-UUID rows");
+  assert.ok(uuidSource.includes("uuid-copy-btn"), "UUID generator should keep per-UUID copy controls");
+  assert.ok(hashSource.includes("hash-result-row"), "Hash generator should keep original hash result row");
+  assert.ok(hashSource.includes("hash-copy-btn"), "Hash generator should keep copy control on result row");
+  assert.ok(hashSource.includes("hash-placeholder"), "Hash generator should keep placeholder state");
 }
 
 async function testQrGeneratorUsesRealEncoder() {
   const source = await fs.readFile(path.join(root, "src/tools/qr-generator/logic.ts"), "utf8");
+  const toolSource = await fs.readFile(path.join(root, "src/tools/qr-generator/Tool.tsx"), "utf8");
   assert.ok(source.includes("Reed-Solomon ECC"), "QR generator should keep the original ECC encoder");
   assert.ok(!source.includes("seededCell"), "QR generator should not use the temporary seeded matrix fallback");
+  assert.ok(toolSource.includes("qr-body"), "QR generator should keep original two-column body");
+  assert.ok(toolSource.includes("qr-placeholder"), "QR generator should keep placeholder state");
+  assert.ok(toolSource.includes("qr-info"), "QR generator should keep version and size info");
 
   const { generateQR } = await importModule("src/tools/qr-generator/logic.ts");
   const result = generateQR("https://example.com");
