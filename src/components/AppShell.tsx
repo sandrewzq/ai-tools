@@ -19,7 +19,7 @@ export function AppShell({ route, tools, children }: Props) {
           <p className="eyebrow">AI Toolkit</p>
           <h1>AI 工具箱</h1>
           <p className="hero-text">
-            一个可直接发布到 GitHub Pages 的静态工具集合，包含大模型测速、配色生成、提示词模板、文本分块、文本比对、Token
+            一个可直接发布到 GitHub Pages 的静态工具集合，包含大模型测速、配色生成、提示词模板、文本分块、文本对比、Token
             计算、JSON 格式化、正则测试、编码转换、时间戳、cURL 转代码、二维码、UUID、哈希、JWT 调试、Cron 解析、颜色转换、YAML、XML、URL、CSV
             等 21 个实用工具。
           </p>
