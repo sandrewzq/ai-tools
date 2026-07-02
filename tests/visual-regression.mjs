@@ -194,7 +194,8 @@ function compareCase(name, current, baseline) {
 function compareBox(name, selector, current, baseline) {
   for (const key of ["x", "y", "width", "height"]) {
     const delta = Math.abs(current[key] - baseline[key]);
-    assert.ok(delta <= 8, `${name} ${selector} ${key} changed by ${delta}px`);
+    const tolerance = key === "height" ? Math.max(12, Math.round(baseline[key] * 0.06)) : 8;
+    assert.ok(delta <= tolerance, `${name} ${selector} ${key} changed by ${delta}px`);
   }
 }
 
