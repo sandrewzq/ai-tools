@@ -26,7 +26,11 @@ npm run preview
 npm test
 npm run typecheck
 npm run build
+npm run test:browser
+npm run test:visual
 ```
+
+更多发布、视觉基线和 CI 排查说明见 [维护手册](docs/maintenance.md)。
 
 ## 工具架构
 
@@ -47,12 +51,16 @@ npm run build
 
 ## GitHub Pages
 
-当前 workflow 使用 Node 20：
+当前 workflow 使用 Node 24：
 
 1. `npm ci`
-2. `npm run build`
-3. 上传 `dist/`
-4. 部署到 GitHub Pages
+2. `npm test`
+3. `npm run typecheck`
+4. `npm run build`
+5. `npm run test:browser`
+6. `npm run test:visual`
+7. 上传 `dist/`
+8. 部署到 GitHub Pages
 
 如果仓库发布在子路径下，`vite.config.ts` 当前使用 `base: "./"`，构建产物可在静态子路径中解析资源。
 
