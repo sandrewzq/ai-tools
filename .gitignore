@@ -1,4 +1,5 @@
 .trae/
+.idea/
 node_modules/
 dist/
 *.tsbuildinfo
